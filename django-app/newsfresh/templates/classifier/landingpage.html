@@ -1,0 +1,19 @@
+{% extends 'base.html' %} {% load static %} {% block col-1 %}
+<div class="col-md align-middle overflow-hidden" id="intro">
+    <div id="info">
+        <h2>Rate your news!</h2>
+        <p>NewsFresh is just like Rotten Tomatoes for news!Users can read, rate, post news & also, keep themselves aware of fake news</p>
+        <div class="text-center">
+            <a href="{% url 'classifier:form' %}" type="button" class="btn z-depth-1-half animated bounce" id="btn">Try!</a>
+        </div>
+    </div>
+
+</div>
+{% endblock %} {% block col-2 %}
+
+<div class="col-md d-flex justify-content-end" id="vector">
+    <img src="{% static 'classifier/img/man.png' %}" id="png" class="animated bounceInRight" alt="vector">
+
+</div>
+
+{% endblock %}
