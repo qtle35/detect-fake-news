@@ -57,6 +57,7 @@ def saveModel(name, date, score):
 
 def predic(text, url):
     url = url.replace(' ', '_')
+    url = url.replace(':', '')
     model = joblib.load(f'model/{url}.pkl')
     df = pd.read_csv('train.csv')
     tfidf_vectorizer.fit(df['text'].to_list())
@@ -82,6 +83,7 @@ def evaluateModel(y_test, y_pred):
 
 def trainData(x_train, x_test, y_train, y_test, datetime):
     date, time = datetime.split()
+    time = time.replace(':', '')
     tfidf_train = tfidf_vectorizer.fit_transform(x_train)
     tfidf_test = tfidf_vectorizer.transform(x_test)
     # Naive Bayes model
