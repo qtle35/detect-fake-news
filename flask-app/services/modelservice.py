@@ -8,35 +8,11 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import mysql.connector
 from mysql.connector import Error
 from flask import jsonify
+from db import create_db_connection, close_db_connection
 
 tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
-model = joblib.load('model/lrmodel.pkl')
-df = pd.read_csv('train.csv')
-text_data = df['text'].to_list()
-tfidf_vectorizer.fit(text_data)
+model = None
 
-def create_db_connection():
-    try:
-        connection = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="12345678",
-            database="flask_data"
-        )
-        if connection.is_connected():
-            print('ket noi thanh cong')
-            return connection
-            
-        else:
-            print("Không thể kết nối đến cơ sở dữ liệu.")
-            return None
-    except Error as e:
-        print(str(e))
-        return None
-
-def close_db_connection(connection):
-    if connection:
-        connection.close()
 
 def execute_query(connection, query, data=None):
     try:
@@ -51,6 +27,7 @@ def execute_query(connection, query, data=None):
         print(str(e))
         return None
 
+
 def getModels():
     conn = create_db_connection()
     if conn:
@@ -58,12 +35,14 @@ def getModels():
     try:
         cursor.execute('''SELECT * FROM model''')
         lsmodel = cursor.fetchall()
-        model_list = [{'id':row[0], 'name': row[1], 'date': row[2], 'acc': row[3], 'pre': row[4], 're': row[5], 'f1': row[6]} for row in lsmodel]
-        
+        model_list = [{'id': row[0], 'name': row[1], 'date': row[2], 'acc': row[3],
+                       'pre': row[4], 're': row[5], 'f1': row[6]} for row in lsmodel]
+
         return model_list
     except Exception as e:
         print(str(e))
         return []
+
 
 def saveModel(name, date, score):
     connection = create_db_connection()
@@ -75,17 +54,23 @@ def saveModel(name, date, score):
         )
         close_db_connection(connection)
 
-def predic(text):
+
+def predic(text, url):
+    url = url.replace(' ', '_')
+    model = joblib.load(f'model/{url}.pkl')
+    df = pd.read_csv('train.csv')
+    tfidf_vectorizer.fit(df['text'].to_list())
     input_vector = tfidf_vectorizer.transform([text])
     prediction = model.predict(input_vector)
     return prediction
+
 
 def evaluateModel(y_test, y_pred):
     accuracy = accuracy_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred)
     recall = recall_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
-    
+
     result = {
         'acc': round(accuracy*100, 2),
         'pre': round(precision*100, 2),
@@ -94,29 +79,34 @@ def evaluateModel(y_test, y_pred):
     }
     return result
 
-def trainData(x_train, x_test, y_train, y_test, date):
+
+def trainData(x_train, x_test, y_train, y_test, datetime):
+    date, time = datetime.split()
     tfidf_train = tfidf_vectorizer.fit_transform(x_train)
     tfidf_test = tfidf_vectorizer.transform(x_test)
     # Naive Bayes model
     nb_model = MultinomialNB()
+
     nb_model.fit(tfidf_train, y_train)
     y_pred = nb_model.predict(tfidf_test)
     score = evaluateModel(y_test, y_pred)
-    joblib.dump(nb_model, "model/nbmodel "+date+".pkl")
-    saveModel('nbmodel', date, score)
+    joblib.dump(nb_model, f"model/nbmodel_{date}_{time}.pkl")
+
+
+    saveModel('nbmodel', datetime, score)
     # LogisticRegression model
     lr_model = LogisticRegression(solver='liblinear', random_state=0)
     lr_model.fit(tfidf_train, y_train)
     y_pred = lr_model.predict(tfidf_test)
-    evaluateModel(y_test, y_pred)
-    joblib.dump(lr_model, "model/lrmodel "+date+".pkl")
     score = evaluateModel(y_test, y_pred)
-    saveModel('lrmodel', date, score)
+    joblib.dump(lr_model, f"model/lrmodel_{date}_{time}.pkl")
+    saveModel('lrmodel', datetime, score)
     # PassiveAggressiveClassifier
     pac_model = PassiveAggressiveClassifier(max_iter=50)
     pac_model.fit(tfidf_train, y_train)
     y_pred = pac_model.predict(tfidf_test)
     score = evaluateModel(y_test, y_pred)
-    joblib.dump(pac_model, "model/pacmodel "+date+".pkl")
-    saveModel('pacmodel', date, score)
-   
+    joblib.dump(pac_model, f"model/pacmodel_{date}_{time}.pkl")
+    saveModel('pacmodel', datetime, score)
+
+

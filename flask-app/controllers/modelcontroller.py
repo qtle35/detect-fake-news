@@ -8,7 +8,8 @@ controllers_bp = Blueprint('controller_bp', __name__)
 def predict():
     data = request.json
     text = data.get('text')
-    prediction = predic(text)
+    url = data.get('model')
+    prediction = predic(text,url)
     if (prediction[0] == 0):
         output = "Unreliable"
     else:

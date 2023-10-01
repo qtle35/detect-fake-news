@@ -15,6 +15,8 @@ function Home() {
             .then((response) => {
                 setModels(response.data);
                 console.log(response.data);
+                handleSelectModel(`${response.data[0].name} ${response.data[0].date}`)
+                
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -22,15 +24,23 @@ function Home() {
     }, []);
 
     const handleTextSubmit = () => {
-        if (!selectedModel) {
-            alert('Please select a model.');
-            return;
-        }
         if (!inputText) {
             alert('Please enter text');
             return;
         }
         axios.post('http://localhost:5000/predict', { text: inputText, model: selectedModel })
+            .then((response) => {
+                setPrediction(response.data.prediction);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Prediction failed. Please try again.');
+            });
+    };
+
+    const handleRetrainSubmit = () => {
+        const currentDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
+        axios.post('http://localhost:5000/retrain', { time: currentDateTime, model: selectedModel })
             .then((response) => {
                 axios.get('http://localhost:5000/getmodel')
                     .then((response) => {
@@ -44,21 +54,13 @@ function Home() {
             })
             .catch((error) => {
                 console.error('Error:', error);
-                alert('Prediction failed. Please try again.');
-            });
-    };
-
-    const handleRetrainSubmit = () => {
-        const currentDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
-        axios.post('http://localhost:5000/retrain', { time: currentDateTime, model: selectedModel })
-            .then((response) => {
-                setPrediction(response.data.prediction);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
                 alert('Retraining failed. Please try again.');
             });
     };
+
+    const handleSelectModel = (url) => {
+        setSelectedModel(url)
+    }
 
     return (
         <div>
@@ -69,13 +71,11 @@ function Home() {
                             <Card.Body>
                                 <div>
                                     <select
-                                        value={selectedModel}
-                                        onChange={(e) => setSelectedModel(e.target.value)}
                                         className="custom-select"
+                                        onChange={(e) => handleSelectModel(e.target.value)}
                                     >
-                                        <option value="">Select a model</option>
                                         {models.map((model, index) => (
-                                            <option key={index} value={model.name}>{`${model.name} ${model.date}`}</option>
+                                            <option key={index} value={`${model.name} ${model.date}`} >{`${model.id} ${model.name} ${model.date}`}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -113,23 +113,29 @@ function Home() {
                     <table className="table">
                         <thead>
                             <tr>
+                                <th>Id</th>
                                 <th>Name</th>
                                 <th>Date</th>
                                 <th>Accuracy</th>
                                 <th>Precision</th>
                                 <th>Recall</th>
                                 <th>F1 Score</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {models.map((model, index) => (
                                 <tr key={index}>
+                                    <td>{model.id}</td>
                                     <td>{model.name}</td>
                                     <td>{model.date}</td>
                                     <td>{model.acc}</td>
                                     <td>{model.pre}</td>
                                     <td>{model.re}</td>
                                     <td>{model.f1}</td>
+                                    <td>
+                                        <Button className="btn btn-danger">Delete</Button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
