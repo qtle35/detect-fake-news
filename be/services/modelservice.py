@@ -9,6 +9,7 @@ import mysql.connector
 from mysql.connector import Error
 from flask import jsonify
 from db import create_db_connection, close_db_connection
+import os
 
 tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
 model = None
@@ -55,6 +56,27 @@ def saveModel(name, date, score):
         close_db_connection(connection)
 
 
+def deleteModel(model):
+    try:
+        connection = create_db_connection()
+        if connection:
+            cursor = execute_query(
+                connection,
+                ''' DELETE FROM model WHERE id = %s''',
+                (model['id'],)
+            )
+            close_db_connection(connection)
+        name = f"{model['name']} {model['date']}"
+        name = name.replace(' ', '_').replace(':', '')
+        print(name)
+        model_filename = f"model/{name}.pkl"
+        if os.path.exists(model_filename):
+            os.remove(model_filename)
+
+    except Exception as e:
+        print(str(e))
+
+
 def predic(text, url):
     url = url.replace(' ', '_')
     url = url.replace(':', '')
@@ -94,7 +116,6 @@ def trainData(x_train, x_test, y_train, y_test, datetime):
     score = evaluateModel(y_test, y_pred)
     joblib.dump(nb_model, f"model/nbmodel_{date}_{time}.pkl")
 
-
     saveModel('nbmodel', datetime, score)
     # LogisticRegression model
     lr_model = LogisticRegression(solver='liblinear', random_state=0)
@@ -110,5 +131,3 @@ def trainData(x_train, x_test, y_train, y_test, datetime):
     score = evaluateModel(y_test, y_pred)
     joblib.dump(pac_model, f"model/pacmodel_{date}_{time}.pkl")
     saveModel('pacmodel', datetime, score)
-
-
