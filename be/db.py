@@ -1,15 +1,19 @@
-# db.py
-
 import mysql.connector
 from mysql.connector import Error
+from dotenv import load_dotenv
+import os
+# from os.path import join, dirname
 
+# dotenv_path = join(dirname(__file__), '.env')
+# load_dotenv(dotenv_path)
+load_dotenv()
 def create_db_connection():
     try:
         connection = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="a123456",
-            database="flask_data"
+            host=os.getenv('DBHOST'),
+            user=os.getenv('DBUSER'),
+            password=os.getenv('DBPASS'),
+            database=os.getenv('DBNAME')
         )
         if connection.is_connected():
             print('Kết nối thành công')
