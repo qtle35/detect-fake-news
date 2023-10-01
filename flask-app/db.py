@@ -8,7 +8,7 @@ def create_db_connection():
         connection = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="12345678",
+            password="a123456",
             database="flask_data"
         )
         if connection.is_connected():
