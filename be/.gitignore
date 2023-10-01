@@ -1,0 +1,4 @@
+/__pycache__
+/controller/__pycache__
+/service/__pycache__
+.env
