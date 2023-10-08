@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Button, Card } from 'react-bootstrap';
+import { Container, Row, Col, Button, Card, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import moment from 'moment';
 import './home.css'
@@ -7,6 +7,7 @@ import './home.css'
 function Home() {
     const [inputText, setInputText] = useState('');
     const [prediction, setPrediction] = useState('');
+    const [loading, setLoading] = useState(false);
     const [models, setModels] = useState([]);
     const [selectedModel, setSelectedModel] = useState('');
 
@@ -16,7 +17,7 @@ function Home() {
                 setModels(response.data);
                 console.log(response.data);
                 handleSelectModel(`${response.data[0].name} ${response.data[0].date}`)
-                
+
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -28,9 +29,12 @@ function Home() {
             alert('Please enter text');
             return;
         }
+        setLoading(true);
+        setPrediction('');
         axios.post('http://localhost:5000/predict', { text: inputText, model: selectedModel })
             .then((response) => {
                 setPrediction(response.data.prediction);
+                setLoading(false);
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -87,7 +91,7 @@ function Home() {
                                     className="custom-textarea"
                                 />
                                 <div className="text-center">
-                                    <Button variant="primary" id="btn-2" className="mr-3 custom-button" onClick={() => handleTextSubmit()}>
+                                    <Button variant="primary" id="btn-2" className="mx-2 custom-button" onClick={() => handleTextSubmit()}>
                                         Predict
                                     </Button>
                                     <Button variant="primary" id="btn-2" className="custom-button" onClick={() => handleRetrainSubmit('retrain')}>
@@ -101,6 +105,13 @@ function Home() {
                                             <p>{prediction}</p>
                                         </Col>
                                     </Row>
+                                )}
+                                {loading && (
+                                    <div className='d-flex justify-content-center my-2'>
+                                        <Spinner animation="border" role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </Spinner>
+                                    </div>
                                 )}
                             </Card.Body>
                         </Card>
