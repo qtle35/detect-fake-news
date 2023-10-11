@@ -67,8 +67,13 @@ function Home() {
     }
 
     return (
-        <div>
+        <div className='py-2'>
             <Container>
+                <h1 className=" mt-[5rem] mb-4 text-3xl font-extrabold dark:text-indigo-800 md:text-5xl lg:text-6xl">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r to-violet-600 from-blue-900">
+                        Machine Learning Detect FakeNews
+                    </span>
+                </h1>
                 <Row>
                     <Col md={6} className="">
                         <Card>
@@ -84,15 +89,16 @@ function Home() {
                                     </select>
                                 </div>
                                 <textarea
-                                    rows={20}
+                                    rows={10}
                                     placeholder="Enter your news here"
                                     value={inputText}
                                     onChange={(e) => setInputText(e.target.value)}
                                     className="custom-textarea"
                                 />
                                 <div className="text-center">
-                                    <Button variant="primary" id="btn-2" className="mx-2 custom-button" onClick={() => handleTextSubmit()}>
+                                    <Button variant="primary" id="btn-2" className="mx-2 custom-button" onClick={() => handleTextSubmit()} disabled={loading} >
                                         Predict
+                                        {loading && <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
                                     </Button>
                                     <Button variant="primary" id="btn-2" className="custom-button" onClick={() => handleRetrainSubmit('retrain')}>
                                         Retrain
@@ -101,8 +107,7 @@ function Home() {
                                 {prediction && (
                                     <Row className="mt-4">
                                         <Col md={12} className="d-flex justify-content-center">
-                                            <h5 className="mb-4">Prediction: </h5>
-                                            <p>{prediction}</p>
+                                            <h5 className="mb-4">Prediction: {prediction}</h5>
                                         </Col>
                                     </Row>
                                 )}
@@ -116,7 +121,7 @@ function Home() {
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col md={6} className="d-flex justify-content-center align-items-center">
+                    <Col md={6} className="d-none d-md-flex justify-content-center align-items-center ">
                         <img src="/img/man-read.png" alt="vector" />
                     </Col>
                 </Row>

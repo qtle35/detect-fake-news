@@ -12,7 +12,7 @@ from db import create_db_connection, close_db_connection
 
 tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
 model = None
-
+tfidf_vec = joblib.load('model/tfidf_vec.pkl')
 
 def execute_query(connection, query, data=None):
     try:
@@ -60,8 +60,7 @@ def predic(text, url):
     url = url.replace(':', '')
     model = joblib.load(f'model/{url}.pkl')
     df = pd.read_csv('train.csv')
-    tfidf_vectorizer.fit(df['text'].to_list())
-    input_vector = tfidf_vectorizer.transform([text])
+    input_vector = tfidf_vec.transform([text])
     prediction = model.predict(input_vector)
     return prediction
 
