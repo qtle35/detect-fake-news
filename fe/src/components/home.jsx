@@ -62,8 +62,23 @@ function Home() {
             });
     };
 
-    const handleSelectModel = (url) => {
-        setSelectedModel(url)
+    const handleDeleteModel = (model) => {
+        axios.post('http://localhost:5000/deletemodel', { model: model })
+            .then((response) => {
+                axios.get('http://localhost:5000/getmodel')
+                    .then((response) => {
+                        setModels(response.data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        alert('Failed to fetch models. Please try again.');
+                    });
+                setPrediction(response.data.prediction);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Deletion failed. Please try again.');
+            });
     }
 
     return (
@@ -81,7 +96,6 @@ function Home() {
                                 <div>
                                     <select
                                         className="custom-select"
-                                        onChange={(e) => handleSelectModel(e.target.value)}
                                     >
                                         {models.map((model, index) => (
                                             <option key={index} value={`${model.name} ${model.date}`} >{`${model.id} ${model.name} ${model.date}`}</option>
@@ -150,7 +164,7 @@ function Home() {
                                     <td>{model.re}</td>
                                     <td>{model.f1}</td>
                                     <td>
-                                        <Button className="btn btn-danger">Delete</Button>
+                                        <Button className="btn btn-danger" onClick={() => handleDeleteModel(model)}>Delete</Button>
                                     </td>
                                 </tr>
                             ))}

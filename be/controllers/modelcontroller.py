@@ -1,5 +1,5 @@
 from flask import jsonify, request, Blueprint
-from services.modelservice import predic, trainData, getModels
+from services.modelservice import predic, trainData, getModels, deleteModel
 import pandas as pd
 
 controllers_bp = Blueprint('controller_bp', __name__)
@@ -32,3 +32,9 @@ def retrain():
 def getmodel():
     models = getModels()
     return jsonify(models), 200
+@controllers_bp.route('/deletemodel', methods=['POST'])
+def deletemodel():
+    model = request.json.get('model')
+    print(model)
+    deleteModel(model)
+    return '1',200
