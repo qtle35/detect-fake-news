@@ -15,9 +15,7 @@ function Home() {
         axios.get('http://localhost:5000/getmodel')
             .then((response) => {
                 setModels(response.data);
-                console.log(response.data);
-                handleSelectModel(`${response.data[0].name} ${response.data[0].date}`)
-
+                setSelectedModel(`${response.data[0].name} ${response.data[0].date}`)
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -49,6 +47,7 @@ function Home() {
                 axios.get('http://localhost:5000/getmodel')
                     .then((response) => {
                         setModels(response.data);
+                        setSelectedModel(`${response.data[0].name} ${response.data[0].date}`)
                     })
                     .catch((error) => {
                         console.error('Error:', error);
