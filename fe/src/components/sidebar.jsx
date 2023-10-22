@@ -10,6 +10,7 @@ import {
     FaList,
     FaRegLaughWink,
     FaHeart,
+    FaHome
 } from 'react-icons/fa';
 
 function CustomSidebar() {
@@ -18,7 +19,7 @@ function CustomSidebar() {
         setCollapsed(!collapsed);
     };
     return (
-        <Sidebar style={{ height: "100vh" }} collapsed={collapsed}>
+        <Sidebar style={{ height: "100%" }} collapsed={collapsed}>
             <Menu>
                 <MenuItem
                     icon={<FaList />}
@@ -27,12 +28,12 @@ function CustomSidebar() {
                 >
                     <h2>Admin</h2>
                 </MenuItem>
-                <MenuItem icon={<FaUser />} component={<Link to="/home" />}>Home</MenuItem>
-                <MenuItem icon={<FaAngleDoubleLeft />}>Team</MenuItem>
+                <MenuItem icon={<FaHome />} component={<Link to="/home" />}>Home</MenuItem>
+                <MenuItem icon={<FaHeart />}>Team</MenuItem>
                 <MenuItem icon={<FaAngleDoubleRight />}>Contacts</MenuItem>
                 <MenuItem icon={<FaTachometerAlt />}>Profile</MenuItem>
                 <MenuItem icon={<FaGem />}>FAQ</MenuItem>
-                <MenuItem icon={<FaList />}>Calendar</MenuItem>
+                <MenuItem icon={<FaRegLaughWink />}>Calendar</MenuItem>
             </Menu>
         </Sidebar>
 

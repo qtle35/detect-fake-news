@@ -3,6 +3,7 @@ import { Container, Row, Col, Button, Card, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import moment from 'moment';
 import './home.css'
+import { FaTrash } from 'react-icons/fa';
 
 function Home() {
     const [inputText, setInputText] = useState('');
@@ -63,23 +64,29 @@ function Home() {
     };
 
     const handleDeleteModel = (model) => {
-        axios.post('http://localhost:5000/deletemodel', { model: model })
-            .then((response) => {
-                axios.get('http://localhost:5000/getmodel')
-                    .then((response) => {
-                        setModels(response.data);
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                        alert('Failed to fetch models. Please try again.');
-                    });
-                setPrediction(response.data.prediction);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                alert('Deletion failed. Please try again.');
-            });
-    }
+        const confirmDelete = window.confirm("Co chac?");
+
+        if (confirmDelete) {
+            axios
+                .post('http://localhost:5000/deletemodel', { model: model })
+                .then((response) => {
+                    axios.get('http://localhost:5000/getmodel')
+                        .then((response) => {
+                            setModels(response.data);
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                            alert('Failed to fetch models. Please try again.');
+                        });
+                    setPrediction(response.data.prediction);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Deletion failed. Please try again.');
+                });
+        }
+    };
+
     const handleSelectModel = (url) => {
         setSelectedModel(url)
     }
@@ -90,8 +97,8 @@ function Home() {
                     Machine Learning Detect FakeNews
                 </span>
             </h1>
-            <Row className>
-                <Col lg="6" md="6" >
+            <Row >
+                <Col lg={8} md={7} >
                     <Card >
                         <Card.Body>
                             <div>
@@ -138,13 +145,13 @@ function Home() {
 
                     </Card>
                 </Col>
-                <Col lg={6} md={6} className="d-flex justify-content-center align-items-center">
+                <Col lg={4} className="d-flex justify-content-center align-items-center">
                     <img src="/img/man-read.png" alt="vector" />
                 </Col>
 
             </Row>
             {models.length > 0 ? (
-                <table className="table">
+                <table className="table table-hover table-bordered">
                     <thead>
                         <tr>
                             <th>Id</th>
@@ -168,7 +175,7 @@ function Home() {
                                 <td>{model.re}</td>
                                 <td>{model.f1}</td>
                                 <td>
-                                    <Button className="btn btn-danger" onClick={() => handleDeleteModel(model)}>Delete</Button>
+                                    <Button className="btn btn-danger" onClick={() => handleDeleteModel(model)}><FaTrash /></Button>
                                 </td>
                             </tr>
                         ))}
