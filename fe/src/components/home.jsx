@@ -80,102 +80,105 @@ function Home() {
                 alert('Deletion failed. Please try again.');
             });
     }
-
+    const handleSelectModel = (url) => {
+        setSelectedModel(url)
+    }
     return (
-        <div className='py-2'>
-            <Container>
-                <h1 className=" mt-[5rem] mb-4 text-3xl font-extrabold dark:text-indigo-800 md:text-5xl lg:text-6xl">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r to-violet-600 from-blue-900">
-                        Machine Learning Detect FakeNews
-                    </span>
-                </h1>
-                <Row>
-                    <Col md={6} className="">
-                        <Card>
-                            <Card.Body>
-                                <div>
-                                    <select
-                                        className="custom-select"
-                                    >
-                                        {models.map((model, index) => (
-                                            <option key={index} value={`${model.name} ${model.date}`} >{`${model.id} ${model.name} ${model.date}`}</option>
-                                        ))}
-                                    </select>
+        <Container>
+            <h1 className="d-flex justify-content-center mt-[5rem] mb-4 text-3xl font-extrabold dark:text-indigo-800 md:text-5xl lg:text-6xl">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r to-violet-600 from-blue-900">
+                    Machine Learning Detect FakeNews
+                </span>
+            </h1>
+            <Row className>
+                <Col lg="6" md="6" >
+                    <Card >
+                        <Card.Body>
+                            <div>
+                                <select
+                                    className="custom-select"
+                                    onChange={(e) => handleSelectModel(e.target.value)}
+                                >
+                                    {models.map((model, index) => (
+                                        <option key={index} value={`${model.name} ${model.date}`} >{`${model.id} ${model.name} ${model.date}`}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <textarea
+                                rows={10}
+                                placeholder="Enter your news here"
+                                value={inputText}
+                                onChange={(e) => setInputText(e.target.value)}
+                                className="custom-textarea"
+                            />
+                            <div className="text-center">
+                                <Button variant="primary" className="mx-2 custom-button" onClick={() => handleTextSubmit()} disabled={loading} >
+                                    Predict
+                                    {loading && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
+                                </Button>
+                                <Button variant="primary" className="custom-button" onClick={() => handleRetrainSubmit('retrain')}>
+                                    Retrain
+                                </Button>
+                            </div>
+                            {prediction && (
+                                <Row className="mt-4">
+                                    <Col md={12} className="d-flex justify-content-center">
+                                        <h5 className="mb-4">Prediction: {prediction}</h5>
+                                    </Col>
+                                </Row>
+                            )}
+                            {loading && (
+                                <div className='d-flex justify-content-center my-2'>
+                                    <Spinner animation="border" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </Spinner>
                                 </div>
-                                <textarea
-                                    rows={10}
-                                    placeholder="Enter your news here"
-                                    value={inputText}
-                                    onChange={(e) => setInputText(e.target.value)}
-                                    className="custom-textarea"
-                                />
-                                <div className="text-center">
-                                    <Button variant="primary" id="btn-2" className="mx-2 custom-button" onClick={() => handleTextSubmit()} disabled={loading} >
-                                        Predict
-                                        {loading && <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
-                                    </Button>
-                                    <Button variant="primary" id="btn-2" className="custom-button" onClick={() => handleRetrainSubmit('retrain')}>
-                                        Retrain
-                                    </Button>
-                                </div>
-                                {prediction && (
-                                    <Row className="mt-4">
-                                        <Col md={12} className="d-flex justify-content-center">
-                                            <h5 className="mb-4">Prediction: {prediction}</h5>
-                                        </Col>
-                                    </Row>
-                                )}
-                                {loading && (
-                                    <div className='d-flex justify-content-center my-2'>
-                                        <Spinner animation="border" role="status">
-                                            <span className="visually-hidden">Loading...</span>
-                                        </Spinner>
-                                    </div>
-                                )}
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col md={6} className="d-none d-md-flex justify-content-center align-items-center ">
-                        <img src="/img/man-read.png" alt="vector" />
-                    </Col>
-                </Row>
-                {models.length > 0 ? (
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Name</th>
-                                <th>Date</th>
-                                <th>Accuracy</th>
-                                <th>Precision</th>
-                                <th>Recall</th>
-                                <th>F1 Score</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {models.map((model, index) => (
-                                <tr key={index}>
-                                    <td>{model.id}</td>
-                                    <td>{model.name}</td>
-                                    <td>{model.date}</td>
-                                    <td>{model.acc}</td>
-                                    <td>{model.pre}</td>
-                                    <td>{model.re}</td>
-                                    <td>{model.f1}</td>
-                                    <td>
-                                        <Button className="btn btn-danger" onClick={() => handleDeleteModel(model)}>Delete</Button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                ) : (
-                    <p>No models available.</p>
-                )}
+                            )}
+                        </Card.Body>
 
-            </Container>
-        </div>
+                    </Card>
+                </Col>
+                <Col lg={6} md={6} className="d-flex justify-content-center align-items-center">
+                    <img src="/img/man-read.png" alt="vector" />
+                </Col>
+
+            </Row>
+            {models.length > 0 ? (
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Accuracy</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1 Score</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {models.map((model, index) => (
+                            <tr key={index}>
+                                <td>{model.id}</td>
+                                <td>{model.name}</td>
+                                <td>{model.date}</td>
+                                <td>{model.acc}</td>
+                                <td>{model.pre}</td>
+                                <td>{model.re}</td>
+                                <td>{model.f1}</td>
+                                <td>
+                                    <Button className="btn btn-danger" onClick={() => handleDeleteModel(model)}>Delete</Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            ) : (
+                <p>No models available.</p>
+            )}
+
+        </Container>
     );
 }
 
