@@ -47,13 +47,21 @@ def getAllLabels():
 
 @controllers_bp.route('/label/<id>', methods=['GET'])
 def getLabel(id):
-    print(id)
-    return jsonify({'vcl': 'vcl'}), 200
+    res = label_service.getOneLabelById(id)
+    if not res:
+        return jsonify({'message': f'Failed to get label with id {id}'}), 400
+    return res
 
 @controllers_bp.route('/label', methods=['POST'])
 def createLabel():
-  return label_service.createLabel(request.json)
+    if label_service.createLabel(request.json):
+        return jsonify({'message': 'Created'}), 201
+    return jsonify({'message': 'Error'}), 400
 
-@controllers_bp.route('/label/:id', methods=['DELETE'])
-def deleteLabel():
-  return
+@controllers_bp.route('/label/<id>', methods=['DELETE'])
+def deleteLabel(id):
+    if not label_service.getOneLabelById(id):
+        return jsonify({'message': 'Not found'}), 404
+    if label_service.deleteLabelById(id):
+        return '', 204
+    return jsonify({'message': 'Error'}), 400

@@ -17,28 +17,50 @@ def getAllLabels():
     cursor = conn.cursor()
   try:
     cursor.execute('''SELECT * FROM label''')
-    lsmodel = cursor.fetchall()
-    model_list = [{'id': row[0], 'name': row[1], 'date': row[2], 'acc': row[3],
-                    'pre': row[4], 're': row[5], 'f1': row[6]} for row in lsmodel]
+    lsLabels = cursor.fetchall()
+    lsLabelEntity = [{'id': row[0], 'name': row[1], 'description': row[2]} for row in lsLabels]
 
-    return lsmodel
+    return lsLabelEntity
   except Exception as e:
     print(str(e))
-    return []
+    return None
+
+def getOneLabelById(id):
+  conn = create_db_connection()
+  if conn:
+    cursor = conn.cursor()
+  try:
+    cursor.execute(f'''SELECT * FROM label WHERE id = {id}''')
+    label = cursor.fetchone()
+    labelEntity = {'id': label[0], 'name': label[1], 'description': label[2]}
+    return labelEntity
+  except Exception as e:
+    print(str(e))
+    return None
 
 def createLabel(label):
-  print(label)
-  # conn = create_db_connection()
-  # if conn:
-  #   cursor = conn.cursor()
-  # try:
-  #   cursor.execute(''' INSERT INTO label (name, description) VALUES (%s, %s)''',
-  #                   (name, description))
-  #   conn.commit()
+  conn = create_db_connection()
+  if conn:
+    cursor = conn.cursor()
+  try:
+    cursor.execute('''INSERT INTO label (name, description) VALUES (%s, %s)''',
+                    (label.get('name'), label.get('description')))
+    conn.commit()
 
-  #   return True
-  # except Exception as e:
-  #   print(str(e))
-  #   return False
-  return True
+    return True
+  except Exception as e:
+    print(str(e))
+    return False
 
+def deleteLabelById(id):
+  conn = create_db_connection()
+  if conn:
+    cursor = conn.cursor()
+  try:
+    cursor.execute(f'''DELETE FROM label WHERE id = {id}''')
+    conn.commit()
+
+    return True
+  except Exception as e:
+    print(str(e))
+    return False
