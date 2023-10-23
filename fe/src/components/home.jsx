@@ -26,6 +26,7 @@ function Home() {
     }, []);
 
     const handleTextSubmit = () => {
+        
         if (!inputText) {
             alert('Please enter text');
             return;
@@ -39,27 +40,34 @@ function Home() {
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setLoading(false);
                 alert('Prediction failed. Please try again.');
+                
             });
     };
 
     const handleRetrainSubmit = () => {
+        setLoading(true);
         const currentDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
         axios.post('http://localhost:5000/retrain', { time: currentDateTime, model: selectedModel })
             .then((response) => {
                 axios.get('http://localhost:5000/getmodel')
                     .then((response) => {
                         setModels(response.data);
+                        setLoading(false);
                     })
                     .catch((error) => {
                         console.error('Error:', error);
                         alert('Failed to fetch models. Please try again.');
+                        setLoading(false);
                     });
                 setPrediction(response.data.prediction);
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setLoading(false);
                 alert('Retraining failed. Please try again.');
+                
             });
     };
 
@@ -123,8 +131,9 @@ function Home() {
                                     Predict
                                     {loading && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
                                 </Button>
-                                <Button variant="primary" className="custom-button" onClick={() => handleRetrainSubmit('retrain')}>
+                                <Button variant="primary" className="custom-button" onClick={() => handleRetrainSubmit('retrain')} disabled={loading}>
                                     Retrain
+                                    {loading && <Spinner animation="border" role="status" className="ms-2" />}
                                 </Button>
                             </div>
                             {prediction && (
