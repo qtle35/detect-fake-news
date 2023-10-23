@@ -17,7 +17,36 @@ def create_db_connection():
         )
         if connection.is_connected():
             print('Kết nối thành công')
-            return connection
+            cursor = connection.cursor()
+            try:
+                cursor.execute(
+                    '''CREATE TABLE IF NOT EXISTS model(
+                        id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                        name VARCHAR(255) NOT NULL,
+                        date TEXT NOT NULL,
+                        acc DOUBLE NOT NULL,
+                        pre DOUBLE NOT NULL,
+                        re DOUBLE NOT NULL,
+                        f1 DOUBLE NOT NULL
+                    );''')
+                cursor.execute(
+                    '''CREATE TABLE IF NOT EXISTS label(
+                        id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                        name VARCHAR(255) NOT NULL,
+                        description TEXT
+                    );''')
+                cursor.execute(
+                    '''CREATE TABLE IF NOT EXISTS sample(
+                        id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                        text VARCHAR(255) NOT NULL,
+                        label_id INTEGER,
+                        FOREIGN KEY (label_id) REFERENCES label(id) ON DELETE SET NULL
+                    );''')
+                cursor.close()
+            except Exception as e:
+                print('Create error')
+            finally:
+                return connection
         else:
             print("Không thể kết nối đến cơ sở dữ liệu.")
             return None
