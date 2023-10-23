@@ -52,10 +52,16 @@ def getLabel(id):
         return jsonify({'message': f'Failed to get label with id {id}'}), 400
     return res
 
-@controllers_bp.route('/label', methods=['POST'])
+@controllers_bp.route('/label/new', methods=['POST'])
 def createLabel():
     if label_service.createLabel(request.json):
         return jsonify({'message': 'Created'}), 201
+    return jsonify({'message': 'Error'}), 400
+
+@controllers_bp.route('/label/<id>', methods=['POST'])
+def updateLabel(id):
+    if label_service.updateLabel(id, request.json):
+        return jsonify({'message': 'Updated'}), 200
     return jsonify({'message': 'Error'}), 400
 
 @controllers_bp.route('/label/<id>', methods=['DELETE'])

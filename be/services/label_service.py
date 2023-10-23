@@ -52,6 +52,23 @@ def createLabel(label):
     print(str(e))
     return False
 
+def updateLabel(id, label):
+  if not getOneLabelById(id):
+    return False
+  conn = create_db_connection()
+  if conn:
+    cursor = conn.cursor()
+  try:
+    cursor.execute(f'''UPDATE label 
+                      SET name = '{label.get('name')}', description = '{label.get('description')}'
+                      WHERE id = {id}''')
+    conn.commit()
+
+    return True
+  except Exception as e:
+    print(str(e))
+    return False
+
 def deleteLabelById(id):
   conn = create_db_connection()
   if conn:
