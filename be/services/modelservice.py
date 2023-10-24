@@ -106,7 +106,7 @@ def trainData(x_train, x_test, y_train, y_test, datetime):
     date, time = datetime.split()
     time = time.replace(':', '')
     tfidf = tfidf_vectorizer.fit(x_train)
-    joblib.dump(tfidf, f"tfidf_vec.pkl")
+    joblib.dump(tfidf, f"model/tfidf_vec.pkl")
     tfidf_train = tfidf_vectorizer.fit_transform(x_train)
     tfidf_test = tfidf_vectorizer.transform(x_test)
     # Naive Bayes model
