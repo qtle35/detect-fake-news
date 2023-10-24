@@ -1,20 +1,13 @@
-from flask import Flask
-from flask_cors import CORS
-from config import ApplicationConfig
-import models.label as label
-from controllers.modelcontroller import controllers_bp
+from factory import app, db
+from routes import blueprint
+from auth.user import User
+from label.label import Label
 
-app = Flask(__name__)
-CORS(app)
-app.config.from_object(ApplicationConfig)
-label.db.init_app(app)
+app.register_blueprint(blueprint)
 
-with app.app_context():
-    label.db.create_all()
+@app.shell_context_processor
+def make_shell_context():
+    return dict(app=app, db=db, User=User, label=Label)
 
-
-app.register_blueprint(controllers_bp)
-
-connection = None
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,6 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from factory import db
 
 class Label(db.Model):
     __tablename__ = "label"
