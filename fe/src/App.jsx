@@ -15,19 +15,15 @@ function App() {
         <div className='col-span-5'>
           <main>
             <Routes>
-              <Route path="/home" element={<Home />} />
-              <Route path="/" element={<Home />} />
+              {/* <Route path="/home" element={<Home />} /> */}
+              <Route path='/' element={<Home />} />
+              <Route path='/label' element={<LabelPage />} />
+              <Route path='/label/:id' element={<LabelEdit />} />
             </Routes>
           </main>
         </div>
 
       </div>
-      {/* <Navbar /> */}
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/label' element={<LabelPage />} />
-        <Route path='/label/:id' element={<LabelEdit />} />
-      </Routes>
     </BrowserRouter>
   );
 }
