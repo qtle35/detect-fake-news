@@ -10,74 +10,49 @@ from mysql.connector import Error
 from flask import jsonify
 from db import create_db_connection, close_db_connection
 import os
+from models.label import Label, db
 
 def getAllLabels():
-  conn = create_db_connection()
-  if conn:
-    cursor = conn.cursor()
-  try:
-    cursor.execute('''SELECT * FROM label''')
-    lsLabels = cursor.fetchall()
-    lsLabelEntity = [{'id': row[0], 'name': row[1], 'description': row[2]} for row in lsLabels]
-
-    return lsLabelEntity
-  except Exception as e:
-    print(str(e))
-    return None
+  labels = Label.query.all()
+  list_label_dict = []
+  for label in labels:
+    label.__dict__.pop('_sa_instance_state') 
+    list_label_dict.append(label.__dict__)
+  return list_label_dict
 
 def getOneLabelById(id):
-  conn = create_db_connection()
-  if conn:
-    cursor = conn.cursor()
-  try:
-    cursor.execute(f'''SELECT * FROM label WHERE id = {id}''')
-    label = cursor.fetchone()
-    labelEntity = {'id': label[0], 'name': label[1], 'description': label[2]}
-    return labelEntity
-  except Exception as e:
-    print(str(e))
-    return None
+  label = Label.query.get(id)
+  label_dict = label.__dict__
+  label_dict.pop('_sa_instance_state')
+  return label_dict
 
 def createLabel(label):
-  conn = create_db_connection()
-  if conn:
-    cursor = conn.cursor()
   try:
-    cursor.execute('''INSERT INTO label (name, description) VALUES (%s, %s)''',
-                    (label.get('name'), label.get('description')))
-    conn.commit()
-
+    new_label = Label(name=label.get('name'), description=label.get('description'))
+    db.session.add(new_label)
+    db.session.commit()
+    # Label.query.add_entity(label)
     return True
-  except Exception as e:
-    print(str(e))
+  except Exception:
     return False
 
 def updateLabel(id, label):
-  if not getOneLabelById(id):
-    return False
-  conn = create_db_connection()
-  if conn:
-    cursor = conn.cursor()
   try:
-    cursor.execute(f'''UPDATE label 
-                      SET name = '{label.get('name')}', description = '{label.get('description')}'
-                      WHERE id = {id}''')
-    conn.commit()
+    new_label = Label.query.get(id)
+    new_label.name = label.get('name')
+    new_label.description = label.get('description')
 
+    db.session.commit()
     return True
   except Exception as e:
     print(str(e))
     return False
 
 def deleteLabelById(id):
-  conn = create_db_connection()
-  if conn:
-    cursor = conn.cursor()
   try:
-    cursor.execute(f'''DELETE FROM label WHERE id = {id}''')
-    conn.commit()
-
+    label = Label.query.get(id)
+    db.session.delete(label)
+    db.session.commit()
     return True
-  except Exception as e:
-    print(str(e))
+  except Exception:
     return False

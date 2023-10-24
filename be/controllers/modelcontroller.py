@@ -2,6 +2,7 @@ from flask import jsonify, request, Blueprint
 from services.modelservice import predic, trainData, getModels, deleteModel
 import services.label_service as label_service
 import pandas as pd
+import json
 
 controllers_bp = Blueprint('controller_bp', __name__)
 
@@ -43,7 +44,7 @@ def deletemodel():
 
 @controllers_bp.route('/label', methods=['GET'])
 def getAllLabels():
-    return label_service.getAllLabels();
+    return json.dumps(label_service.getAllLabels())
 
 @controllers_bp.route('/label/<id>', methods=['GET'])
 def getLabel(id):
@@ -58,7 +59,7 @@ def createLabel():
         return jsonify({'message': 'Created'}), 201
     return jsonify({'message': 'Error'}), 400
 
-@controllers_bp.route('/label/<id>', methods=['POST'])
+@controllers_bp.route('/label/<id>', methods=['PUT'])
 def updateLabel(id):
     if label_service.updateLabel(id, request.json):
         return jsonify({'message': 'Updated'}), 200

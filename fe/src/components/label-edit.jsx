@@ -33,7 +33,7 @@ function LabelEdit() {
     event.preventDefault();
     let checkError = false;
     if (id !== 'new') {
-      await axios.post(`http://localhost:5000/label/${id}`, label)
+      await axios.put(`http://localhost:5000/label/${id}`, label)
         .catch(err => {
           checkError = true;
           console.log(err)
