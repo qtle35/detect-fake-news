@@ -11,6 +11,8 @@ function Home() {
     const [loading, setLoading] = useState(false);
     const [models, setModels] = useState([]);
     const [selectedModel, setSelectedModel] = useState('');
+    const [countData, setCountData] = useState('');
+    const [isRetrain, setIsRetrain] = useState(false);
 
     useEffect(() => {
         axios.get('http://localhost:5000/getmodel')
@@ -21,6 +23,16 @@ function Home() {
             .catch((error) => {
                 console.error('Error:', error);
             });
+        axios.get('http://localhost:5000/getdatacount')
+        .then((response) => {
+            setCountData(response.data);
+            if(response.data.new> response.data.total/10){
+                setIsRetrain(true);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
     }, []);
 
     const handleTextSubmit = () => {
@@ -127,7 +139,7 @@ function Home() {
                                     Predict
                                     {loading && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
                                 </Button>
-                                <Button variant="primary" className="custom-button" onClick={() => handleRetrainSubmit('retrain')} disabled={loading}>
+                                <Button variant="primary" className="custom-button" disabled = {isRetrain || loading} onClick={() => handleRetrainSubmit('retrain')}>
                                     Retrain
                                     {loading && <Spinner animation="border" role="status" className="ms-2" />}
                                 </Button>

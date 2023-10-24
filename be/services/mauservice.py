@@ -28,7 +28,7 @@ def getMaus():
             SELECT mau.id, mau.title, mau.noiDung, mau.theLoai, mau.ngayTaoMau, mau.ngaySuaMau,
                 mau.nhan_id, label.name
             FROM mau
-            LEFT JOIN label ON mau.nhan_id = label.id
+            LEFT JOIN label ON mau.nhan_id = label.id limit 11
         ''')
         result = cursor.fetchall()
         mau_list = [
@@ -130,4 +130,9 @@ def deleteMau(mau_id):
             close_db_connection(connection)
     except Exception as e:
         print(str(e))
+
+
+
+
+
 

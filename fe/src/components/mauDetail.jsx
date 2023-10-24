@@ -30,7 +30,7 @@ function MauDetail() {
 
     const fetchLabels = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/labels`);
+            const response = await axios.get(`http://localhost:5000/label`);
             setLabels(response.data);
         } catch (error) {
             console.log(error);

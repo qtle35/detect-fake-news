@@ -1,10 +1,18 @@
 from flask import jsonify, request, Blueprint
-from services.modelservice import predic, trainData, getModels, deleteModel
+from services.modelservice import predic, trainData, getModels, deleteModel, getDataCount
 import services.label_service as label_service
 import pandas as pd
+# from services.mauservice import getDataCount
 
 controllers_bp = Blueprint('controller_bp', __name__)
 
+
+@controllers_bp.route('/getdatacount', methods=['GET'])
+def checktrain():
+    print(11111111)
+    dataCount = getDataCount()
+    print(dataCount)
+    return jsonify(dataCount), 200
 @controllers_bp.route('/predict', methods=['POST'])
 def predict():
     data = request.json

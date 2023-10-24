@@ -134,3 +134,20 @@ def trainData(x_train, x_test, y_train, y_test, datetime):
     saveModel('pacmodel', datetime, score)
 
 
+def getDataCount():
+    conn = create_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute('SELECT count(*) FROM flask_data.mau WHERE isnew IS NULL;')
+            count_null = cursor.fetchone()[0]
+            
+            cursor.execute('SELECT count(*) FROM flask_data.mau WHERE isnew = 1;')
+            count_1 = cursor.fetchone()[0]
+            
+            return {'total':count_null, 'new': count_1}
+        except Exception as e:
+            print("Error executing SQL query:", str(e))
+        finally:
+            cursor.close()
+            conn.close()

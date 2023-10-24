@@ -29,7 +29,7 @@ function CustomSidebar() {
                     <h2>Admin</h2>
                 </MenuItem>
                 <MenuItem icon={<FaHome />} component={<Link to="/home" />}>Home</MenuItem>
-                <MenuItem icon={<FaHeart />}>Team</MenuItem>
+                <MenuItem icon={<FaList />} component={<Link to="/maus" />}>Mẫu</MenuItem>
                 <MenuItem icon={<FaAngleDoubleRight />}>Contacts</MenuItem>
                 <MenuItem icon={<FaTachometerAlt />}>Profile</MenuItem>
                 <MenuItem icon={<FaGem />}>FAQ</MenuItem>

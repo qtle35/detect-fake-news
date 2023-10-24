@@ -2,11 +2,16 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Table, Button } from "react-bootstrap";
+import ReactPaginate from "react-paginate";
 
 function Maus() {
     const [maus, setMaus] = useState([]);
+    const [expandedMaus, setExpandedMaus] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const mausPerPage = 5;
+    const [searchTerm, setSearchTerm] = useState(""); // Step 1
+
     const navigate = useNavigate();
-    // const [searchTerm, setSearchTerm] = useState("");
 
     const onViewClick = (id) => {
         navigate(`/mau/${id}`);
@@ -34,11 +39,42 @@ function Maus() {
         fetchMaus();
     }, []);
 
+    const toggleExpand = (id) => {
+        if (expandedMaus.includes(id)) {
+            setExpandedMaus(expandedMaus.filter((mauId) => mauId !== id));
+        } else {
+            setExpandedMaus([...expandedMaus, id]);
+        }
+    };
+
+    const pageCount = Math.ceil(maus.length / mausPerPage);
+
+    const handlePageClick = ({ selected }) => {
+        setCurrentPage(selected);
+    };
+
+    const filteredMaus = maus.filter((mau) => {
+        return (
+            mau.title.toLowerCase().includes(searchTerm.toLowerCase()) // Step 2
+        );
+    });
+
+    const currentMaus = filteredMaus.slice(currentPage * mausPerPage, (currentPage + 1) * mausPerPage); // Step 4
+
     return (
         <div>
-            <h2 className="text-center">Mau List</h2>
+            <h2 className="text-center">Mẫu List</h2>
             <div className="row">
+
                 <div className="col">
+                    <div className="text-center mb-3">
+                        <input
+                            type="text"
+                            placeholder="Search by Title"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)} // Step 3
+                        />
+                    </div>
                     <button className="btn btn-primary" onClick={() => onViewClick(-1)}>
                         Thêm Mẫu
                     </button>
@@ -56,17 +92,25 @@ function Maus() {
                             </tr>
                         </thead>
                         <tbody>
-                            {maus.map((mau) => (
+                            {currentMaus.map((mau) => (
                                 <tr key={mau.id}>
                                     <td>{mau.id}</td>
                                     <td>{mau.title}</td>
-                                    <td>{mau.noiDung}</td>
+                                    <td>
+                                        {expandedMaus.includes(mau.id) ? mau.noiDung : `${mau.noiDung.slice(0, 50)}...`}
+                                        <button
+                                            onClick={() => toggleExpand(mau.id)}
+                                            className="btn btn-link"
+                                        >
+                                            {expandedMaus.includes(mau.id) ? "Ẩn" : "Hiện thêm"}
+                                        </button>
+                                    </td>
                                     <td>{mau.theLoai}</td>
                                     <td>{new Date(mau.ngayTaoMau).toLocaleDateString()}</td>
                                     <td>
-                                        {mau.ngaySuaMau !== '01-01-1970' ? new Date(mau.ngaySuaMau).toLocaleDateString() : ''}
+                                        {mau.ngaySuaMau !== null ? new Date(mau.ngaySuaMau).toLocaleDateString() : ''}
                                     </td>
-                                    <td>{mau.nhan_name}</td> {/* Tên nhãn từ bảng "nhan" */}
+                                    <td>{mau.nhan_name}</td>
                                     <td>
                                         <Button
                                             variant="primary"
@@ -86,6 +130,20 @@ function Maus() {
                             ))}
                         </tbody>
                     </Table>
+                    <div className="text-center">
+                        <ReactPaginate
+                            previousLabel={"Previous"}
+                            nextLabel={"Next"}
+                            breakLabel={"..."}
+                            pageCount={pageCount}
+                            marginPagesDisplayed={2}
+                            pageRangeDisplayed={5}
+                            onPageChange={handlePageClick}
+                            containerClassName={"pagination"}
+                            subContainerClassName={"pages pagination"}
+                            activeClassName={"active"}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

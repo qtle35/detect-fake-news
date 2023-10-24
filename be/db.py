@@ -42,6 +42,18 @@ def create_db_connection():
                         label_id INTEGER,
                         FOREIGN KEY (label_id) REFERENCES label(id) ON DELETE SET NULL
                     );''')
+                cursor.execute(    
+                    '''CREATE TABLE IF NOT EXISTS mau (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        itle LONGTEXT,
+                        noiDung LONGTEXT,
+                        theLoai LONGTEXT,
+                        ngayTaoMau DATE,
+                        ngaySuaMau DATE,
+                        nhan_id INT,
+                        isnew TINYINT(1)
+                        FOREIGN KEY (nhan_id) REFERENCES label(id) ON DELETE SET NULL
+                            );''')
                 cursor.close()
             except Exception as e:
                 print('Create error')
