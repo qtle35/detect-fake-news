@@ -18,6 +18,7 @@ function LabelPage() {
 
   return (
     <Container>
+      <h1>Label</h1>
       <Button variant="primary" as={Link} to={'new'}>
         Create label
       </Button>
