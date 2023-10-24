@@ -16,9 +16,7 @@ function Home() {
         axios.get('http://localhost:5000/getmodel')
             .then((response) => {
                 setModels(response.data);
-                console.log(response.data);
-                handleSelectModel(`${response.data[0].name} ${response.data[0].date}`)
-
+                setSelectedModel(`${response.data[0].name} ${response.data[0].date}`)
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -55,6 +53,7 @@ function Home() {
                     .then((response) => {
                         setModels(response.data);
                         setLoading(false);
+                        setSelectedModel(`${response.data[0].name} ${response.data[0].date}`)
                     })
                     .catch((error) => {
                         console.error('Error:', error);
@@ -95,9 +94,6 @@ function Home() {
         }
     };
 
-    const handleSelectModel = (url) => {
-        setSelectedModel(url)
-    }
     return (
         <Container>
             <h1 className="d-flex justify-content-center mt-[5rem] mb-4 text-3xl font-extrabold dark:text-indigo-800 md:text-5xl lg:text-6xl">
@@ -112,7 +108,7 @@ function Home() {
                             <div>
                                 <select
                                     className="custom-select"
-                                    onChange={(e) => handleSelectModel(e.target.value)}
+                                    onChange={(e) => setSelectedModel(e.target.value)}
                                 >
                                     {models.map((model, index) => (
                                         <option key={index} value={`${model.name} ${model.date}`} >{`${model.id} ${model.name} ${model.date}`}</option>

@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './components/home';
 import CustomSidebar from './components/sidebar';
+import LabelPage from './components/label-page';
+import React from 'react';
+import LabelEdit from './components/label-edit';
 
 function App() {
   return (
@@ -13,7 +16,9 @@ function App() {
           <main>
             <Routes>
               <Route path="/home" element={<Home />} />
-              <Route path="/" element={<Home />} />
+              <Route path='/' element={<Home />} />
+              <Route path='/label' element={<LabelPage />} />
+              <Route path='/label/:id' element={<LabelEdit />} />
             </Routes>
           </main>
         </div>
