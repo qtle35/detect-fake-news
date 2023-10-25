@@ -37,5 +37,5 @@ def updateLabel(id):
 @blueprint.route('/label/<id>', methods=['DELETE'])
 def deleteLabel(id):
     if Label.deleteLabelById(id):
-        return '', 204
+        return jsonify({'message': 'Deleted'}), 200
     return jsonify({'message': 'Error'}), 400

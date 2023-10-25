@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, Row, Col, Button, Card, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import moment from 'moment';
 import './home.css'
 import { FaTrash } from 'react-icons/fa';
+import { useAuth } from './auth-context';
 
 function Home() {
     const [inputText, setInputText] = useState('');
@@ -11,6 +12,10 @@ function Home() {
     const [loading, setLoading] = useState(false);
     const [models, setModels] = useState([]);
     const [selectedModel, setSelectedModel] = useState('');
+    const [countData, setCountData] = useState('');
+    const [isRetrain, setIsRetrain] = useState(true);
+    const { getUser } = useAuth()
+    const user = getUser()
 
     useEffect(() => {
         axios.get('http://localhost:5000/getmodel')
@@ -21,10 +26,20 @@ function Home() {
             .catch((error) => {
                 console.error('Error:', error);
             });
+        axios.get('http://localhost:5000/getdatacount')
+            .then((response) => {
+                setCountData(response.data);
+                if (response.data.new > Math.floor(response.data.total / 10)) {
+                    setIsRetrain(false);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }, []);
 
     const handleTextSubmit = () => {
-        
+
         if (!inputText) {
             alert('Please enter text');
             return;
@@ -40,7 +55,7 @@ function Home() {
                 console.error('Error:', error);
                 setLoading(false);
                 alert('Prediction failed. Please try again.');
-                
+
             });
     };
 
@@ -60,13 +75,23 @@ function Home() {
                         alert('Failed to fetch models. Please try again.');
                         setLoading(false);
                     });
+                axios.get('http://localhost:5000/getdatacount')
+                    .then((response) => {
+                        setCountData(response.data);
+                        if (response.data.new > Math.floor(response.data.total / 10)) {
+                            setIsRetrain(false);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
                 setPrediction(response.data.prediction);
             })
             .catch((error) => {
                 console.error('Error:', error);
                 setLoading(false);
                 alert('Retraining failed. Please try again.');
-                
+
             });
     };
 
@@ -127,10 +152,10 @@ function Home() {
                                     Predict
                                     {loading && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
                                 </Button>
-                                <Button variant="primary" className="custom-button" onClick={() => handleRetrainSubmit('retrain')} disabled={loading}>
-                                    Retrain
-                                    {loading && <Spinner animation="border" role="status" className="ms-2" />}
-                                </Button>
+                                {user && <Button variant="primary" className="custom-button" disabled={isRetrain || loading} onClick={() => handleRetrainSubmit('retrain')}>
+                                    {!isRetrain ? "Retrain" : `${countData.new}/${Math.floor(countData.total / 10)}`}
+                                    {loading && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
+                                </Button>}
                             </div>
                             {prediction && (
                                 <Row className="mt-4">
@@ -166,7 +191,7 @@ function Home() {
                             <th>Precision</th>
                             <th>Recall</th>
                             <th>F1 Score</th>
-                            <th>Action</th>
+                            {user && <th>Action</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -179,9 +204,9 @@ function Home() {
                                 <td>{model.pre}</td>
                                 <td>{model.re}</td>
                                 <td>{model.f1}</td>
-                                <td>
+                                {user && <td>
                                     <Button className="btn btn-danger" onClick={() => handleDeleteModel(model)}><FaTrash /></Button>
-                                </td>
+                                </td>}
                             </tr>
                         ))}
                     </tbody>

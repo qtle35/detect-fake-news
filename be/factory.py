@@ -1,5 +1,6 @@
 import os
-
+import joblib
+from sklearn.feature_extraction.text import TfidfVectorizer
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -19,3 +20,7 @@ with app.app_context():
 cors = CORS(app, supports_credentials=True)
 bcrypt = Bcrypt()
 auth = HTTPBasicAuth()
+
+tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
+current_model = None
+tfidf_vec = joblib.load('models/tfidf_vec.pkl')

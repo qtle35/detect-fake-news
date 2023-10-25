@@ -52,6 +52,7 @@ function LabelEdit() {
   return (
     <div>
       <Container>
+        <h1 className="mb-4">Label</h1>
         <Form onSubmit={handleSubmit}>
           <Form.Group className='mb-3'>
             {id !== 'new' &&

@@ -2,5 +2,5 @@ __pycache__
 */__pycache__
 .env
 
-model/*.pkl
-!model/tfidf_vec.pkl
+models/*.pkl
+!models/tfidf_vec.pkl

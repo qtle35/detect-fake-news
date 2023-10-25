@@ -11,5 +11,5 @@ def login():
 
     user = User.check_login(username, password)
     if user:
-        return json.dumps({ username: username, password: password }), 200
+        return json.dumps({ "username": username, "password": password }), 200
     return jsonify({"message": "Authorized"}), 401
