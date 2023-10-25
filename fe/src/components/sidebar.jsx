@@ -12,12 +12,19 @@ import {
     FaHeart,
     FaHome
 } from 'react-icons/fa';
+import { useAuth } from './auth-context';
 
 function CustomSidebar() {
+    const { userIsAuthenticated, userLogout } = useAuth()
     const [collapsed, setCollapsed] = useState(false);
     const collapseSidebar = () => {
         setCollapsed(!collapsed);
     };
+    const logout = async (event) => {
+        event.preventDefault();
+        await userLogout()
+        window.location.href = '/login'
+    }
     return (
         <Sidebar style={{ height: "100%" }} collapsed={collapsed}>
             <Menu>
@@ -28,12 +35,13 @@ function CustomSidebar() {
                 >
                     <h2>Admin</h2>
                 </MenuItem>
-                <MenuItem icon={<FaHome />} component={<Link to="/home" />}>Home</MenuItem>
+                <MenuItem icon={<FaHome />} component={<Link to="/" />}>Home</MenuItem>
                 <MenuItem icon={<FaHeart />}>Team</MenuItem>
                 <MenuItem icon={<FaAngleDoubleRight />}>Contacts</MenuItem>
-                <MenuItem icon={<FaTachometerAlt />}>Profile</MenuItem>
-                <MenuItem icon={<FaGem />}>FAQ</MenuItem>
-                <MenuItem icon={<FaRegLaughWink />}>Calendar</MenuItem>
+                <MenuItem icon={<FaTachometerAlt />} component={<Link to="/label" />}>Label</MenuItem>
+                {!userIsAuthenticated() && <MenuItem icon={<FaGem />} component={<Link to="/login" />}>Login</MenuItem>}
+                {userIsAuthenticated() && <p>Admin</p>}
+                {userIsAuthenticated() && <MenuItem icon={<FaRegLaughWink />} onClick={logout}>Logout</MenuItem>}
             </Menu>
         </Sidebar>
 

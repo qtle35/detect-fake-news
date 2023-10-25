@@ -2,12 +2,18 @@ import React from 'react';
 import { Button, Container, Table } from 'react-bootstrap';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useAuth } from './auth-context';
 
 function LabelPage() {
+  const { getUser } = useAuth()
+  const user = getUser()
+
   const [labels, setLabels] = React.useState([]);
 
   React.useEffect(() => {
-    axios.get('http://localhost:5000/label')
+    axios.get('http://localhost:5000/label', {
+      auth: user
+    })
       .then((response) => {
         setLabels(response.data);
       })
