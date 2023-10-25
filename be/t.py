@@ -2,13 +2,16 @@ import mysql.connector
 import pandas as pd
 from datetime import datetime
 import re
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # Kết nối đến cơ sở dữ liệu MySQL
 mydatabase = mysql.connector.connect(
-        host=os.getenv('DBHOST'),
-        user=os.getenv('DBUSER'),
-        password=os.getenv('DBPASS'),
-        database=os.getenv('DBNAME')
+    host=os.getenv('DBHOST'),
+    user=os.getenv('DBUSER'),
+    password=os.getenv('DBPASS'),
+    database=os.getenv('DBNAME')
 )
 
 mycursor = mydatabase.cursor()
@@ -30,11 +33,13 @@ CREATE TABLE IF NOT EXISTS mau (
 mycursor.execute(create_table_sql)
 
 # Định dạng cho mẫu ngày từ ngày tháng năm
-date_pattern = r'(\w+) (\d{1,2}), (\d{4)'
+date_pattern = r'(\w+) (\d{1,2}), (\d{4})'
 
 # Đọc dữ liệu từ tệp CSV bằng pandas
 df = pd.read_csv('train.csv', encoding='utf-8')
 count = 0
+
+# ...
 
 for index, row in df.iterrows():
     title = row['title']
@@ -43,8 +48,8 @@ for index, row in df.iterrows():
     date_str = row['date']
     match = re.match(date_pattern, date_str)
     count += 1
-
-    if match:
+    print(match)
+    try:
         month = match.group(1)
         day = int(match.group(2))
         year = int(match.group(3))
@@ -58,13 +63,19 @@ for index, row in df.iterrows():
 
         ngayTaoMau = datetime(year, month, day).strftime("%Y-%m-%d")
 
-    nhan_id = int(row['label'])
+        nhan_id = int(row['label'])
 
-    # Đoạn mã SQL để chèn dữ liệu vào bảng 'mau'
-    insert_sql = "INSERT INTO mau (title, noiDung, theLoai, ngayTaoMau, nhan_id) VALUES (%s, %s, %s, %s, %s)"
-    values = (title, noiDung, theLoai, ngayTaoMau, nhan_id)
+        # Đoạn mã SQL để chèn dữ liệu vào bảng 'mau'
+        insert_sql = "INSERT INTO mau (title, noiDung, theLoai, ngayTaoMau, nhan_id) VALUES (%s, %s, %s, %s, %s)"
+        values = (title, noiDung, theLoai, ngayTaoMau, nhan_id)
 
-    mycursor.execute(insert_sql, values)
-    mydatabase.commit()
+        mycursor.execute(insert_sql, values)
+        mydatabase.commit()
+
+    except AttributeError:
+        print(f"Failed to match date for row {index}: {date_str}")
+
+# ...
 
 mydatabase.close()
+

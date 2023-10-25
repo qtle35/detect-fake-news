@@ -15,6 +15,7 @@ tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
 model = None
 tfidf_vec = joblib.load('model/tfidf_vec.pkl')
 
+
 def execute_query(connection, query, data=None):
     try:
         cursor = connection.cursor()
@@ -102,11 +103,27 @@ def evaluateModel(y_test, y_pred):
     return result
 
 
+def set_isnew_to_null():
+    conn = create_db_connection()
+
+    if conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute('UPDATE flask_data.mau SET isnew = NULL;')
+            conn.commit()
+        except Exception as e:
+            print("Error executing SQL query:", str(e))
+        finally:
+            cursor.close()
+            conn.close()
+
+
 def trainData(x_train, x_test, y_train, y_test, datetime):
     date, time = datetime.split()
     time = time.replace(':', '')
     tfidf = tfidf_vectorizer.fit(x_train)
     joblib.dump(tfidf, f"model/tfidf_vec.pkl")
+    set_isnew_to_null()
     tfidf_train = tfidf_vectorizer.fit_transform(x_train)
     tfidf_test = tfidf_vectorizer.transform(x_test)
     # Naive Bayes model
@@ -139,13 +156,15 @@ def getDataCount():
     if conn:
         cursor = conn.cursor()
         try:
-            cursor.execute('SELECT count(*) FROM flask_data.mau WHERE isnew IS NULL;')
+            cursor.execute(
+                'SELECT count(*) FROM flask_data.mau WHERE isnew IS NULL;')
             count_null = cursor.fetchone()[0]
-            
-            cursor.execute('SELECT count(*) FROM flask_data.mau WHERE isnew = 1;')
+
+            cursor.execute(
+                'SELECT count(*) FROM flask_data.mau WHERE isnew = 1;')
             count_1 = cursor.fetchone()[0]
-            
-            return {'total':count_null, 'new': count_1}
+
+            return {'total': count_null, 'new': count_1}
         except Exception as e:
             print("Error executing SQL query:", str(e))
         finally:

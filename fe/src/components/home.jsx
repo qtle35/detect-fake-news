@@ -24,19 +24,19 @@ function Home() {
                 console.error('Error:', error);
             });
         axios.get('http://localhost:5000/getdatacount')
-        .then((response) => {
-            setCountData(response.data);
-            if(response.data.new> response.data.total/10){
-                setIsRetrain(true);
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+            .then((response) => {
+                setCountData(response.data);
+                if (response.data.new > Math.floor(response.data.total / 10)) {
+                    setIsRetrain(false);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }, []);
 
     const handleTextSubmit = () => {
-        
+
         if (!inputText) {
             alert('Please enter text');
             return;
@@ -52,7 +52,7 @@ function Home() {
                 console.error('Error:', error);
                 setLoading(false);
                 alert('Prediction failed. Please try again.');
-                
+
             });
     };
 
@@ -72,13 +72,23 @@ function Home() {
                         alert('Failed to fetch models. Please try again.');
                         setLoading(false);
                     });
+                axios.get('http://localhost:5000/getdatacount')
+                    .then((response) => {
+                        setCountData(response.data);
+                        if (response.data.new > Math.floor(response.data.total / 10)) {
+                            setIsRetrain(false);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
                 setPrediction(response.data.prediction);
             })
             .catch((error) => {
                 console.error('Error:', error);
                 setLoading(false);
                 alert('Retraining failed. Please try again.');
-                
+
             });
     };
 
@@ -139,9 +149,9 @@ function Home() {
                                     Predict
                                     {loading && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
                                 </Button>
-                                <Button variant="primary" className="custom-button" disabled = {isRetrain || loading} onClick={() => handleRetrainSubmit('retrain')}>
-                                    Retrain
-                                    {loading && <Spinner animation="border" role="status" className="ms-2" />}
+                                <Button variant="primary" className="custom-button" disabled={isRetrain} onClick={() => handleRetrainSubmit('retrain')}>
+                                    {countData.new}/{Math.floor(countData.total / 10)}
+                                    {loading && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
                                 </Button>
                             </div>
                             {prediction && (

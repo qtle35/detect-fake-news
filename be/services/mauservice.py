@@ -95,10 +95,10 @@ def saveMau(title, noiDung, theLoai, nhan_id, ngayTaoMau, ngaySuaMau):
         )
         close_db_connection(connection)
         
-        # # Lưu dữ liệu vào tệp CSV
-        # with open('train.csv', 'a', newline='') as csvfile:
-        #     csv_writer = csv.writer(csvfile)
-        #     csv_writer.writerow([title, noiDung, theLoai, ngayTaoMau, nhan_id])
+        # Lưu dữ liệu vào tệp CSV
+        with open('train.csv', 'a', newline='') as csvfile:
+            csv_writer = csv.writer(csvfile)
+            csv_writer.writerow([title, noiDung, theLoai, ngayTaoMau, nhan_id])
 
 def updateMau(mau_id, title, noiDung, theLoai, nhan_id, ngaySuaMau):
     try:
