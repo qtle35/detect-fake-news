@@ -5,28 +5,34 @@ import MauDetail from './components/mauDetail';
 import CustomSidebar from './components/sidebar';
 import LabelPage from './components/label-page';
 import LabelEdit from './components/label-edit';
+import Login from './components/login';
+import { AuthProvider } from './components/auth-context'
+import PrivateRoute from './components/private-route'
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className='grid grid-cols-6'>
-        <div className='col-span-1'>
-          <CustomSidebar />
+    <AuthProvider>
+      <BrowserRouter>
+        <div className='grid grid-cols-6'>
+          <div className='col-span-1'>
+            <CustomSidebar />
+          </div>
+          <div className='col-span-5'>
+            <main>
+              <Routes>
+                {/* <Route path="/home" element={<Home />} /> */}
+                <Route path='/' element={<Home />} />
+                <Route path='/login' element={<Login />} />
+                <Route path='/label' element={<PrivateRoute><LabelPage /></PrivateRoute>} />
+                <Route path='/label/:id' element={<LabelEdit />} />
+                <Route path='/maus' element={<Maus />} />
+                <Route path='/mau/:id' element={<MauDetail />} />
+              </Routes>
+            </main>
+          </div>
         </div>
-        <div className='col-span-5'>
-          <main>
-            <Routes>
-              <Route path="/home" element={<Home />} />
-              <Route path='/' element={<Home />} />
-              <Route path='/label' element={<LabelPage />} />
-              <Route path='/label/:id' element={<LabelEdit />} />
-              <Route path='/maus' element={<Maus />} />
-              <Route path='/mau/:id' element={<MauDetail />} />
-            </Routes>
-          </main>
-        </div>
-      </div>
-    </BrowserRouter>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

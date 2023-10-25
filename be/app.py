@@ -1,15 +1,15 @@
-from flask import Flask
-from flask_cors import CORS
-from controllers.modelcontroller import controllers_bp
-from controllers.maucontroller import controllers_bp1
+from factory import app, db
+from routes import blueprint
+from auth.user import User
+from label.label import Label
+from sample.sample import Sample
+from model.model import Model
 
-app = Flask(__name__)
-CORS(app)
+app.register_blueprint(blueprint)
 
+@app.shell_context_processor
+def make_shell_context():
+    return dict(app=app, db=db, User=User, label=Label, sample=Sample, model=Model)
 
-app.register_blueprint(controllers_bp)
-app.register_blueprint(controllers_bp1)
-
-connection = None
 if __name__ == "__main__":
     app.run(debug=True)

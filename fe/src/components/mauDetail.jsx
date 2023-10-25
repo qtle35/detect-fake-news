@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from './auth-context';
 
 function MauDetail() {
     const { id } = useParams();
@@ -8,6 +9,8 @@ function MauDetail() {
     const [isEditing, setIsEditing] = useState(id === "-1");
     const [labels, setLabels] = useState([]);
     const [selectedLabel, setSelectedLabel] = useState("true");
+    const { getUser } = useAuth()
+    const user = getUser()
 
     useEffect(() => {
         const fetchMau = async () => {
@@ -30,7 +33,9 @@ function MauDetail() {
 
     const fetchLabels = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/label`);
+            const response = await axios.get(`http://localhost:5000/label/all`, {
+                auth: user
+            });
             setLabels(response.data);
         } catch (error) {
             console.log(error);

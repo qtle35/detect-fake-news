@@ -2,12 +2,18 @@ import React from 'react';
 import { Button, Container, Table } from 'react-bootstrap';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useAuth } from './auth-context';
 
 function LabelPage() {
+  const { getUser } = useAuth()
+  const user = getUser()
+
   const [labels, setLabels] = React.useState([]);
 
   React.useEffect(() => {
-    axios.get('http://localhost:5000/label')
+    axios.get('http://localhost:5000/label', {
+      auth: user
+    })
       .then((response) => {
         setLabels(response.data);
       })
@@ -16,13 +22,28 @@ function LabelPage() {
       });
   }, []);
 
+  const handleDelete = (id) => {
+    const confirmDelete = window.confirm("Co chac?");
+    if (confirmDelete) {
+      axios
+        .delete(`http://localhost:5000/label/${id}`)
+        .then(() => {
+          let updatedLabels = [...labels].filter(i => i.id !== id);
+          setLabels(updatedLabels);
+        }).catch((error) => {
+          console.error('Error:', error);
+          alert('Deletion failed. Please try again.');
+        });
+    }
+  };
+
   return (
     <Container>
       <h1>Label</h1>
       <Button variant="primary" as={Link} to={'new'}>
         Create label
       </Button>
-      <Table>
+      <Table striped bordered>
         <thead>
           <tr>
             <th>Id</th>
@@ -39,7 +60,7 @@ function LabelPage() {
               <td>{label.description}</td>
               <td>
                 <Button className="btn btn-primary" as={Link} to={`/label/${label.id}`}>Edit</Button> {' '}
-                <Button className="btn btn-danger" onClick={() => { }}>Delete</Button>
+                <Button className="btn btn-danger" onClick={() => handleDelete(label.id)}>Delete</Button>
               </td>
             </tr>
           ))}

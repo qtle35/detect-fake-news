@@ -4,6 +4,7 @@ import axios from 'axios';
 import moment from 'moment';
 import './home.css'
 import { FaTrash } from 'react-icons/fa';
+import { useAuth } from './auth-context';
 
 function Home() {
     const [inputText, setInputText] = useState('');
@@ -12,7 +13,9 @@ function Home() {
     const [models, setModels] = useState([]);
     const [selectedModel, setSelectedModel] = useState('');
     const [countData, setCountData] = useState('');
-    const [isRetrain, setIsRetrain] = useState(false);
+    const [isRetrain, setIsRetrain] = useState(true);
+    const { getUser } = useAuth()
+    const user = getUser()
 
     useEffect(() => {
         axios.get('http://localhost:5000/getmodel')
@@ -149,10 +152,10 @@ function Home() {
                                     Predict
                                     {loading && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
                                 </Button>
-                                <Button variant="primary" className="custom-button" disabled={isRetrain} onClick={() => handleRetrainSubmit('retrain')}>
-                                    {countData.new}/{Math.floor(countData.total / 10)}
+                                {user && <Button variant="primary" className="custom-button" disabled={isRetrain || loading} onClick={() => handleRetrainSubmit('retrain')}>
+                                    {!isRetrain ? "Retrain" : `${countData.new}/${Math.floor(countData.total / 10)}`}
                                     {loading && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>}
-                                </Button>
+                                </Button>}
                             </div>
                             {prediction && (
                                 <Row className="mt-4">
@@ -188,7 +191,7 @@ function Home() {
                             <th>Precision</th>
                             <th>Recall</th>
                             <th>F1 Score</th>
-                            <th>Action</th>
+                            {user && <th>Action</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -201,9 +204,9 @@ function Home() {
                                 <td>{model.pre}</td>
                                 <td>{model.re}</td>
                                 <td>{model.f1}</td>
-                                <td>
+                                {user && <td>
                                     <Button className="btn btn-danger" onClick={() => handleDeleteModel(model)}><FaTrash /></Button>
-                                </td>
+                                </td>}
                             </tr>
                         ))}
                     </tbody>
