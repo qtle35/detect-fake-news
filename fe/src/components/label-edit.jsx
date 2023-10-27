@@ -16,7 +16,9 @@ function LabelEdit() {
   
   React.useEffect(() => {
     if (id !== 'new') {
-      axios.get(`http://localhost:5000/label/${id}`)
+      axios.get(`http://localhost:5000/label/${id}`, {
+        auth: user
+      })
         .then(res => {
           setLabel(res.data)
         }).catch(err => {
@@ -33,14 +35,22 @@ function LabelEdit() {
     event.preventDefault();
     let checkError = false;
     if (id !== 'new') {
-      await axios.put(`http://localhost:5000/label/${id}`, label)
-        .catch(err => {
+      await axios.put(`http://localhost:5000/label/${id}`, label, {
+        auth: user
+      })
+        .then(() => {
+          window.alert('Ok')
+        }).catch(err => {
           checkError = true;
           console.log(err)
         })
     } else {
-      await axios.post(`http://localhost:5000/label/new`, label)
-        .catch(err => {
+      await axios.post(`http://localhost:5000/label/new`, label, {
+        auth: user
+      })
+        .then(() => {
+          window.alert('Ok')
+        }).catch(err => {
           checkError = true;
           console.log(err)
         })

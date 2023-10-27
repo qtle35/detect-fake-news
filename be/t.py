@@ -17,20 +17,20 @@ mydatabase = mysql.connector.connect(
 mycursor = mydatabase.cursor()
 
 # Đoạn mã SQL để tạo bảng 'mau'
-create_table_sql = """
-CREATE TABLE IF NOT EXISTS mau (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title LONGTEXT,
-    noiDung LONGTEXT,
-    theLoai LONGTEXT,
-    ngayTaoMau DATE,
-    ngaySuaMau DATE,
-    nhan_id INT,
-    isnew TINYINT(1)
-)
-"""
+# create_table_sql = """
+# CREATE TABLE IF NOT EXISTS mau (
+#     id INT AUTO_INCREMENT PRIMARY KEY,
+#     title LONGTEXT,
+#     noiDung LONGTEXT,
+#     theLoai LONGTEXT,
+#     ngayTaoMau DATE,
+#     ngaySuaMau DATE,
+#     nhan_id INT,
+#     isnew TINYINT(1)
+# )
+# """
 
-mycursor.execute(create_table_sql)
+# mycursor.execute(create_table_sql)
 
 # Định dạng cho mẫu ngày từ ngày tháng năm
 date_pattern = r'(\w+) (\d{1,2}), (\d{4})'

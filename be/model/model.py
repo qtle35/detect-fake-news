@@ -62,7 +62,7 @@ class Model(db.Model):
         time = time.replace(':', '')
         tfidf = tfidf_vectorizer.fit(x_train)
         joblib.dump(tfidf, f"models/tfidf_vec.pkl")
-        Model.set_isnew_to_null()
+        Sample.set_isnew_to_null()
         tfidf_train = tfidf_vectorizer.fit_transform(x_train)
         tfidf_test = tfidf_vectorizer.transform(x_test)
         # Naive Bayes model
@@ -89,16 +89,6 @@ class Model(db.Model):
         joblib.dump(pac_model, f"models/pacmodel_{date}_{time}.pkl")
         Model.saveModel('pacmodel', datetime, score)
         
-    def getDataCount():
-        try:
-            sample_alias = aliased(Sample)
-            count_null = db.session.query(func.count(Sample.id)).filter(sample_alias.isnew.is_(None)).scalar()
-            count_1 = db.session.query(func.count(Sample.id)).filter(sample_alias.isnew == 1).scalar()
-            return {'total': count_null, 'new': count_1}
-        except Exception as e:
-            print("Error executing SQL query:", str(e))
-            return None
-
     def saveModel(name, date, score):
         try:
             print(name, date, score)
@@ -128,12 +118,4 @@ class Model(db.Model):
         }
         return result
 
-    def set_isnew_to_null():
-        try:
-            update_stmt = update(Sample).values(isnew=None)
-            db.session.execute(update_stmt)
-            db.session.commit()
-            return True
-        except Exception as e:
-            print(str(e))
-            return False
+    

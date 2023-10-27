@@ -25,8 +25,9 @@ function LabelPage() {
   const handleDelete = (id) => {
     const confirmDelete = window.confirm("Co chac?");
     if (confirmDelete) {
-      axios
-        .delete(`http://localhost:5000/label/${id}`)
+      axios.delete(`http://localhost:5000/label/${id}`, {
+        auth: user
+      })
         .then(() => {
           let updatedLabels = [...labels].filter(i => i.id !== id);
           setLabels(updatedLabels);
