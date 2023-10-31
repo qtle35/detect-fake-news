@@ -5,7 +5,7 @@ import csv
 from label.label import Label
 from sqlalchemy import text
 import json
-from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import contains_eager,joinedload
 
 class Sample(db.Model):
     __tablename__ = "mau"
@@ -23,25 +23,59 @@ class Sample(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-    def getAllSamples():
-        stmt = (
-            db.select(Sample)
-            .join(Sample.label)
-            .options(contains_eager(Sample.label))
-            .order_by(Sample.id)
-        )
-        list_sample_dict = []
-        for row in db.session.execute(stmt):
-            sample_dict = row.Sample.__dict__
-            sample_dict['ngayTaoMau'] = row.Sample.ngayTaoMau.__str__()
-            sample_dict['ngaySuaMau'] = row.Sample.ngaySuaMau.__str__()
-            sample_dict['nhan_id'] = row.Sample.label.id
-            sample_dict['nhan_name'] = row.Sample.label.name
-            sample_dict.pop('_sa_instance_state')
-            sample_dict.pop('label')
-            list_sample_dict.append(sample_dict)
-            # break
-        return list_sample_dict
+    def getAllSamples(page=1, per_page=10, offset=0):
+        try:
+            page = max(1, page)  # Ensure page is always at least 1
+
+            offset = (page - 1) * per_page
+            samples = Sample.query \
+                .join(Sample.label) \
+                .options(contains_eager(Sample.label)) \
+                .order_by(Sample.id) \
+                .offset(offset) \
+                .limit(per_page) \
+                .all()
+            list_sample_dict = []
+            for sample in samples:
+                sample_dict = sample.as_dict()
+                sample_dict['ngayTaoMau'] = sample.ngayTaoMau.__str__()
+                sample_dict['ngaySuaMau'] = sample.ngaySuaMau.__str__()
+                sample_dict['nhan_id'] = sample.label.id
+                sample_dict['nhan_name'] = sample.label.name
+                list_sample_dict.append(sample_dict)
+            return list_sample_dict
+        except Exception as e:
+            print("Error executing SQL query:", str(e))
+            return None
+
+    def searchSamplesByTitle(title, page, per_page, offset):
+        try:
+            samples = Sample.query.filter(Sample.title.ilike(f"%{title}%")) \
+                .order_by(Sample.id) \
+                .offset(offset) \
+                .limit(per_page) \
+                .all()
+            # Chuyển đổi kết quả thành danh sách từ điển và trả về
+            list_sample_dict = []
+            for sample in samples:
+                sample_dict = sample.as_dict()
+                sample_dict['ngayTaoMau'] = sample.ngayTaoMau.__str__()
+                sample_dict['ngaySuaMau'] = sample.ngaySuaMau.__str__()
+                sample_dict['nhan_id'] = sample.label.id
+                sample_dict['nhan_name'] = sample.label.name
+                list_sample_dict.append(sample_dict)
+            return list_sample_dict
+        except Exception as e:
+            print("Error executing SQL query:", str(e))
+            return None
+
+    def countSamplesByTitle(title):
+        try:
+            count = Sample.query.filter(Sample.title.ilike(f"%{title}%")).count()
+            return count
+        except Exception as e:
+            print("Error executing SQL query:", str(e))
+            return 0
 
     def getOneSampleById(id):
         sample = Sample.query.get(id)
@@ -60,9 +94,9 @@ class Sample(db.Model):
                                 nhan_id=sample.get('nhan_id'))
             db.session.add(new_sample)
             db.session.commit()
-            with open('train.csv', 'a', newline='') as csvfile:
-                csv_writer = csv.writer(csvfile)
-                csv_writer.writerow([sample.get('title'), sample.get('noiDung'), sample.get('theLoai'), sample.get('ngayTaoMau'), sample.get('nhan_id')])
+            # with open('train.csv', 'a', newline='') as csvfile:
+            #     csv_writer = csv.writer(csvfile)
+            #     csv_writer.writerow([sample.get('title'), sample.get('noiDung'), sample.get('theLoai'), sample.get('ngayTaoMau'), sample.get('nhan_id')])
             # Sample.query.add_entity(sample)
             return True
         except Exception:
@@ -114,4 +148,23 @@ class Sample(db.Model):
         except Exception as e:
             print("Error executing SQL query:", str(e))
             return None
+        
+    # def searchSamplesByTitle(title):
+    #     try:
+    #         samples = Sample.query.filter(Sample.title.ilike(f"%{title}%")).all()
+    #         result = []
+    #         for sample in samples:
+    #             sample_dict = sample.as_dict()
+    #             sample_dict['ngayTaoMau'] = sample.ngayTaoMau.__str__()
+    #             sample_dict['ngaySuaMau'] = sample.ngaySuaMau.__str__()
+    #             sample_dict['nhan_id'] = sample.label.id
+    #             sample_dict['nhan_name'] = sample.label.name
+    #             result.append(sample_dict)
+    #         return result
+    #     except Exception as e:
+    #         print("Error executing SQL query:", str(e))
+    #         return None
+
+
+
 
