@@ -87,15 +87,28 @@ class Sample(db.Model):
             return False
 
     def deleteSampleById(id):
-        if not Sample.getOneSampleById(id):
+        sample = Sample.query.get(id)
+        if not sample:
             return False
+
         try:
-            sample = Sample.query.get(id)
             db.session.delete(sample)
             db.session.commit()
+            with open('train.csv', 'r', newline='') as csvfile:
+                csv_reader = csv.reader(csvfile)
+                data = list(csv_reader)
+            data_to_remove = [sample.title, sample.noiDung, sample.theLoai]
+            with open('train.csv', 'w', newline='') as csvfile:
+                csv_writer = csv.writer(csvfile)
+                for row in data:
+                    if data_to_remove != row[0:3]:
+                        csv_writer.writerow(row)
+
             return True
-        except Exception:
+        except Exception as e:
+            print(str(e))
             return False
+
 
     def set_isnew_to_null():
         try:
