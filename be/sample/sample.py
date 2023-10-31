@@ -5,10 +5,9 @@ import csv
 from label.label import Label
 from sqlalchemy import text
 import json
-from sqlalchemy.orm import contains_eager,joinedload
+from sqlalchemy.orm import contains_eager
+from sqlalchemy import update, func
 from io import StringIO
-import codecs
-
 
 class Sample(db.Model):
     __tablename__ = "mau"
@@ -32,8 +31,7 @@ class Sample(db.Model):
 
             offset = (page - 1) * per_page
             samples = Sample.query \
-                .join(Sample.label) \
-                .options(contains_eager(Sample.label)) \
+                .outerjoin(Sample.label) \
                 .order_by(Sample.id) \
                 .offset(offset) \
                 .limit(per_page) \
@@ -43,8 +41,11 @@ class Sample(db.Model):
                 sample_dict = sample.as_dict()
                 sample_dict['ngayTaoMau'] = sample.ngayTaoMau.__str__()
                 sample_dict['ngaySuaMau'] = sample.ngaySuaMau.__str__()
-                sample_dict['nhan_id'] = sample.label.id
-                sample_dict['nhan_name'] = sample.label.name
+                if row.Sample.label != None:
+                    sample_dict['nhan_id'] = sample.label.id
+                    sample_dict['nhan_name'] = sample.label.name
+                    sample_dict.pop('label')
+                sample_dict.pop('_sa_instance_state')
                 list_sample_dict.append(sample_dict)
             return list_sample_dict
         except Exception as e:
@@ -54,6 +55,7 @@ class Sample(db.Model):
     def searchSamplesByTitle(title, page, per_page, offset):
         try:
             samples = Sample.query.filter(Sample.title.ilike(f"%{title}%")) \
+                .outerjoin(Sample.label) \
                 .order_by(Sample.id) \
                 .offset(offset) \
                 .limit(per_page) \
@@ -64,8 +66,11 @@ class Sample(db.Model):
                 sample_dict = sample.as_dict()
                 sample_dict['ngayTaoMau'] = sample.ngayTaoMau.__str__()
                 sample_dict['ngaySuaMau'] = sample.ngaySuaMau.__str__()
-                sample_dict['nhan_id'] = sample.label.id
-                sample_dict['nhan_name'] = sample.label.name
+                if row.Sample.label != None:
+                    sample_dict['nhan_id'] = sample.label.id
+                    sample_dict['nhan_name'] = sample.label.name
+                    sample_dict.pop('label')
+                sample_dict.pop('_sa_instance_state')
                 list_sample_dict.append(sample_dict)
             return list_sample_dict
         except Exception as e:
@@ -83,6 +88,10 @@ class Sample(db.Model):
     def getOneSampleById(id):
         sample = Sample.query.get(id)
         sample_dict = sample.__dict__
+        if sample.label != None:
+            sample_dict['nhan_id'] = sample.label.id
+            sample_dict['nhan_name'] = sample.label.name
+            sample_dict.pop('label')
         sample_dict.pop('_sa_instance_state')
         return sample_dict
 
@@ -131,7 +140,10 @@ class Sample(db.Model):
             db.session.delete(sample)
             db.session.commit()
             data_to_remove = [sample.title, sample.noiDung, sample.theLoai]
+<<<<<<< HEAD
             
+=======
+>>>>>>> d19151b95b93565d52164297bd39548edcd71ee8
             with open('train.csv', 'r', newline='', encoding='utf-8') as csvfile, StringIO() as temp_file:
                 csv_reader = csv.reader(csvfile)
                 csv_writer = csv.writer(temp_file)
