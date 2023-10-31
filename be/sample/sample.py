@@ -7,6 +7,7 @@ from sqlalchemy import text
 import json
 from sqlalchemy.orm import contains_eager
 from sqlalchemy import update, func
+from io import StringIO
 
 class Sample(db.Model):
     __tablename__ = "mau"
@@ -94,15 +95,18 @@ class Sample(db.Model):
         try:
             db.session.delete(sample)
             db.session.commit()
-            with open('train.csv', 'r', newline='') as csvfile:
-                csv_reader = csv.reader(csvfile)
-                data = list(csv_reader)
             data_to_remove = [sample.title, sample.noiDung, sample.theLoai]
-            with open('train.csv', 'w', newline='') as csvfile:
-                csv_writer = csv.writer(csvfile)
-                for row in data:
-                    if data_to_remove != row[0:3]:
+            with open('train.csv', 'r', newline='') as csvfile, StringIO() as temp_file:
+                csv_reader = csv.reader(csvfile)
+                csv_writer = csv.writer(temp_file)
+
+                for row in csv_reader:
+                    if data_to_remove != row[0:3]:  # So sánh các thông tin
                         csv_writer.writerow(row)
+
+                # Ghi lại dữ liệu đã lọc vào tệp CSV
+                with open('train.csv', 'w', newline='') as new_csvfile:
+                    new_csvfile.write(temp_file.getvalue())
 
             return True
         except Exception as e:
