@@ -6,6 +6,9 @@ from label.label import Label
 from sqlalchemy import text
 import json
 from sqlalchemy.orm import contains_eager,joinedload
+from io import StringIO
+import codecs
+
 
 class Sample(db.Model):
     __tablename__ = "mau"
@@ -94,9 +97,9 @@ class Sample(db.Model):
                                 nhan_id=sample.get('nhan_id'))
             db.session.add(new_sample)
             db.session.commit()
-            # with open('train.csv', 'a', newline='') as csvfile:
-            #     csv_writer = csv.writer(csvfile)
-            #     csv_writer.writerow([sample.get('title'), sample.get('noiDung'), sample.get('theLoai'), sample.get('ngayTaoMau'), sample.get('nhan_id')])
+            with open('train.csv', 'a', newline='') as csvfile:
+                csv_writer = csv.writer(csvfile)
+                csv_writer.writerow([sample.get('title'), sample.get('noiDung'), sample.get('theLoai'), sample.get('ngayTaoMau'), sample.get('nhan_id')])
             # Sample.query.add_entity(sample)
             return True
         except Exception:
@@ -120,15 +123,32 @@ class Sample(db.Model):
             return False
 
     def deleteSampleById(id):
-        if not Sample.getOneSampleById(id):
+        sample = Sample.query.get(id)
+        if not sample:
             return False
+
         try:
-            sample = Sample.query.get(id)
             db.session.delete(sample)
             db.session.commit()
+            data_to_remove = [sample.title, sample.noiDung, sample.theLoai]
+            
+            with open('train.csv', 'r', newline='', encoding='utf-8') as csvfile, StringIO() as temp_file:
+                csv_reader = csv.reader(csvfile)
+                csv_writer = csv.writer(temp_file)
+
+                for row in csv_reader:
+                    if data_to_remove != row[0:3]:  # So sánh các thông tin
+                        csv_writer.writerow(row)
+
+                # Ghi lại dữ liệu đã lọc vào tệp CSV
+                with open('train.csv', 'w', newline='', encoding='utf-8') as new_csvfile:
+                    new_csvfile.write(temp_file.getvalue())
+
             return True
-        except Exception:
+        except Exception as e:
+            print(str(e))
             return False
+
 
     def set_isnew_to_null():
         try:
