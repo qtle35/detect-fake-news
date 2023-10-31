@@ -6,6 +6,7 @@ from label.label import Label
 from sqlalchemy import text
 import json
 from sqlalchemy.orm import contains_eager
+from sqlalchemy import update, func
 
 class Sample(db.Model):
     __tablename__ = "mau"
