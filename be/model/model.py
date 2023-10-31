@@ -1,5 +1,6 @@
 import joblib
 import pandas as pd
+import numpy as np
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import PassiveAggressiveClassifier
@@ -52,10 +53,11 @@ class Model(db.Model):
         url = url.replace(' ', '_')
         url = url.replace(':', '')
         current_model = joblib.load(f'models/{url}.pkl')
-        df = pd.read_csv('train.csv')
+        # df = pd.read_csv('train.csv')
         input_vector = tfidf_vec.transform([text])
         prediction = current_model.predict(input_vector)
-        return prediction
+        probability = current_model.predict_proba(input_vector)
+        return prediction, probability
 
     def trainData(x_train, x_test, y_train, y_test, datetime):
         date, time = datetime.split()

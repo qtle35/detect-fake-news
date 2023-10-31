@@ -11,7 +11,7 @@ function LabelPage() {
   const [labels, setLabels] = React.useState([]);
 
   React.useEffect(() => {
-    axios.get('http://localhost:5000/label', {
+    axios.get('http://localhost:5000/label/all', {
       auth: user
     })
       .then((response) => {

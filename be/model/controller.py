@@ -1,8 +1,10 @@
 import pandas as pd
+import numpy as np
 from flask import jsonify, request
 from routes import blueprint
 from model.model import Model
 from sample.sample import Sample
+from predict_log.predict_log import PredictLog
 import json
 from factory import auth
 
@@ -16,7 +18,8 @@ def predict():
     data = request.json
     text = data.get('text')
     url = data.get('model')
-    prediction = Model.predic(text,url)
+    prediction, probability = Model.predic(text,url)
+    PredictLog.createPredictLog(text, url, 'Fake' if prediction[0] == 0 else 'Real', float(np.max(probability)))
     if (prediction[0] == 0):
         output = "Unreliable"
     else:

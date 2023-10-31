@@ -8,6 +8,7 @@ import LabelEdit from './components/label-edit';
 import Login from './components/login';
 import { AuthProvider } from './components/auth-context'
 import PrivateRoute from './components/private-route'
+import PredictLogPage from './components/predict-log';
 
 function App() {
   return (
@@ -24,9 +25,10 @@ function App() {
                 <Route path='/' element={<Home />} />
                 <Route path='/login' element={<Login />} />
                 <Route path='/label' element={<PrivateRoute><LabelPage /></PrivateRoute>} />
-                <Route path='/label/:id' element={<LabelEdit />} />
+                <Route path='/label/:id' element={<PrivateRoute><LabelEdit /></PrivateRoute>} />
                 <Route path='/maus' element={<Maus />} />
                 <Route path='/mau/:id' element={<MauDetail />} />
+                <Route path='/predict-log' element={<PredictLogPage />} />
               </Routes>
             </main>
           </div>

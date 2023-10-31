@@ -38,6 +38,7 @@ function CustomSidebar() {
                 <MenuItem icon={<FaHome />} component={<Link to="/" />}>Home</MenuItem>
                 {userIsAuthenticated() && <MenuItem icon={<FaList />} component={<Link to="/maus" />}>Mẫu</MenuItem>}
                 {userIsAuthenticated() && <MenuItem icon={<FaTachometerAlt />} component={<Link to="/label" />}>Label</MenuItem>}
+                <MenuItem icon={<FaTachometerAlt />} component={<Link to="/predict-log" />}>Predict Log</MenuItem>
                 {!userIsAuthenticated() && <MenuItem icon={<FaGem />} component={<Link to="/login" />}>Login</MenuItem>}
                 {userIsAuthenticated() && <MenuItem icon={<FaRegLaughWink />} onClick={logout}>Logout</MenuItem>}
             </Menu>
