@@ -75,6 +75,7 @@ function Home() {
                         alert('Failed to fetch models. Please try again.');
                         setLoading(false);
                     });
+                setIsRetrain(true)
                 axios.get('http://localhost:5000/getdatacount')
                     .then((response) => {
                         setCountData(response.data);
@@ -121,8 +122,8 @@ function Home() {
 
     return (
         <Container>
-            <h1 className="d-flex justify-content-center mt-[5rem] mb-4 text-3xl font-extrabold dark:text-indigo-800 md:text-5xl lg:text-6xl">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r to-violet-600 from-blue-900">
+            <h1 className="d-flex justify-content-center mt-[4rem] mb-4 text-3xl font-extrabold md:text-5xl lg:text-6xl">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r to-violet-600 from-blue-900 leading-normal">
                     Machine Learning Detect FakeNews
                 </span>
             </h1>

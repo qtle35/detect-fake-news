@@ -2,12 +2,13 @@ import pandas as pd
 from flask import jsonify, request
 from routes import blueprint
 from model.model import Model
+from sample.sample import Sample
 import json
 from factory import auth
 
 @blueprint.route('/getdatacount', methods=['GET'])
 def checktrain():
-    dataCount = Model.getDataCount()
+    dataCount = Sample.getDataCount()
     return jsonify(dataCount), 200
 
 @blueprint.route('/predict', methods=['POST'])
@@ -22,9 +23,11 @@ def predict():
         output = "Reliable"
     return jsonify({'prediction': output}), 200
 
-@blueprint.route('/retrain', methods=['GET'])
+@blueprint.route('/retrain', methods=['POST'])
 def retrain():
     data = request.json
+    print('--------------------------------')
+    print(data)
     text = data.get('time')
     df_train = pd.read_csv('train.csv')
     df_test = pd.read_csv('test.csv')
