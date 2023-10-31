@@ -58,6 +58,13 @@ function Maus() {
         }
     };
 
+    const confirmDeleteAlert = (id) => {
+        const confirm = window.confirm("Bạn có chắc chắn muốn xóa mẫu này không?");
+        if (confirm) {
+            handleDelete(id);
+        }
+    };
+
     const searchMaus = () => {
         setSearchTerm(searchInput);
     };
@@ -111,7 +118,7 @@ function Maus() {
                                     <td>{mau.theLoai}</td>
                                     <td>{mau.ngayTaoMau}</td>
                                     <td>
-                                        {mau.ngaySuaMau || ''}
+                                        {mau.ngaySuaMau || ""}
                                     </td>
                                     <td>{mau.nhan_name}</td>
                                     <td>
@@ -124,7 +131,7 @@ function Maus() {
                                         </Button>
                                         <Button
                                             variant="danger"
-                                            onClick={() => handleDelete(mau.id)}
+                                            onClick={() => confirmDeleteAlert(mau.id)}
                                         >
                                             Delete
                                         </Button>
