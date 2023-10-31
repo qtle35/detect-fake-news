@@ -9,7 +9,6 @@ class PredictLog(db.Model):
   text = db.Column(LONGTEXT, nullable=False)
   model_used = db.Column(db.String(255), nullable=False)
   prediction = db.Column(db.String(255), nullable=False)
-  probability = db.Column(db.Double, nullable=False)
   create_at = db.Column(DATE, nullable=False, default=datetime.datetime.now)
 
   def getAllPredict_logs():
@@ -21,12 +20,11 @@ class PredictLog(db.Model):
         list_predict_log_dict.append(predict_log.__dict__)
     return list_predict_log_dict
 
-  def createPredictLog(text, model_used, prediction, probability):
+  def createPredictLog(text, model_used, prediction):
     try:
       new_predictLog = PredictLog(text=text, 
                                   model_used=model_used,
-                                  prediction=prediction,
-                                  probability=probability)
+                                  prediction=prediction)
       db.session.add(new_predictLog)
       db.session.commit()
       # PredictLog.query.add_entity(predictLog)

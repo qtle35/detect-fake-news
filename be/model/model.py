@@ -56,8 +56,7 @@ class Model(db.Model):
         # df = pd.read_csv('train.csv')
         input_vector = tfidf_vec.transform([text])
         prediction = current_model.predict(input_vector)
-        probability = current_model.predict_proba(input_vector)
-        return prediction, probability
+        return prediction
 
     def trainData(x_train, x_test, y_train, y_test, datetime):
         date, time = datetime.split()

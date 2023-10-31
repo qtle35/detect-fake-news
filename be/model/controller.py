@@ -18,8 +18,8 @@ def predict():
     data = request.json
     text = data.get('text')
     url = data.get('model')
-    prediction, probability = Model.predic(text,url)
-    PredictLog.createPredictLog(text, url, 'Fake' if prediction[0] == 0 else 'Real', float(np.max(probability)))
+    prediction = Model.predic(text,url)
+    PredictLog.createPredictLog(text, url, 'Fake' if prediction[0] == 0 else 'Real')
     if (prediction[0] == 0):
         output = "Unreliable"
     else:

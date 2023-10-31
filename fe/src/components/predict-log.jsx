@@ -26,7 +26,6 @@ function PredictLogPage() {
             <th>Text</th>
             <th>Model</th>
             <th>Prediction</th>
-            <th>Probability</th>
             <th>Create at</th>
           </tr>
         </thead>
@@ -37,7 +36,6 @@ function PredictLogPage() {
               <td>{predictLog.text}</td>
               <td>{predictLog.model_used}</td>
               <td>{predictLog.prediction}</td>
-              <td>{Math.round(predictLog.probability * 10000)/100}%</td>
               <td>{predictLog.create_at}</td>
             </tr>
           ))}

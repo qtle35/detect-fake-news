@@ -28,8 +28,7 @@ class Sample(db.Model):
     def getAllSamples():
         stmt = (
             db.select(Sample)
-            .join(Sample.label)
-            .options(contains_eager(Sample.label))
+            .outerjoin(Sample.label)
             .order_by(Sample.id)
         )
         list_sample_dict = []
@@ -37,10 +36,11 @@ class Sample(db.Model):
             sample_dict = row.Sample.__dict__
             sample_dict['ngayTaoMau'] = row.Sample.ngayTaoMau.__str__()
             sample_dict['ngaySuaMau'] = row.Sample.ngaySuaMau.__str__()
-            sample_dict['nhan_id'] = row.Sample.label.id
-            sample_dict['nhan_name'] = row.Sample.label.name
+            if row.Sample.label != None:
+                sample_dict['nhan_id'] = row.Sample.label.id
+                sample_dict['nhan_name'] = row.Sample.label.name
+                sample_dict.pop('label')
             sample_dict.pop('_sa_instance_state')
-            sample_dict.pop('label')
             list_sample_dict.append(sample_dict)
             # break
         return list_sample_dict
@@ -48,6 +48,10 @@ class Sample(db.Model):
     def getOneSampleById(id):
         sample = Sample.query.get(id)
         sample_dict = sample.__dict__
+        if sample.label != None:
+            sample_dict['nhan_id'] = sample.label.id
+            sample_dict['nhan_name'] = sample.label.name
+            sample_dict.pop('label')
         sample_dict.pop('_sa_instance_state')
         return sample_dict
 
@@ -96,7 +100,7 @@ class Sample(db.Model):
             db.session.delete(sample)
             db.session.commit()
             data_to_remove = [sample.title, sample.noiDung, sample.theLoai]
-            with open('train.csv', 'r', newline='') as csvfile, StringIO() as temp_file:
+            with open('train.csv', 'r', newline='', encoding='utf-8') as csvfile, StringIO() as temp_file:
                 csv_reader = csv.reader(csvfile)
                 csv_writer = csv.writer(temp_file)
 
@@ -105,7 +109,7 @@ class Sample(db.Model):
                         csv_writer.writerow(row)
 
                 # Ghi lại dữ liệu đã lọc vào tệp CSV
-                with open('train.csv', 'w', newline='') as new_csvfile:
+                with open('train.csv', 'w', newline='', encoding='utf-8') as new_csvfile:
                     new_csvfile.write(temp_file.getvalue())
 
             return True
