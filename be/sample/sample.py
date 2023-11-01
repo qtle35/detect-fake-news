@@ -25,25 +25,68 @@ class Sample(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-    def getAllSamples():
-        stmt = (
-            db.select(Sample)
-            .outerjoin(Sample.label)
-            .order_by(Sample.id)
-        )
-        list_sample_dict = []
-        for row in db.session.execute(stmt):
-            sample_dict = row.Sample.__dict__
-            sample_dict['ngayTaoMau'] = row.Sample.ngayTaoMau.__str__()
-            sample_dict['ngaySuaMau'] = row.Sample.ngaySuaMau.__str__()
-            if row.Sample.label != None:
-                sample_dict['nhan_id'] = row.Sample.label.id
-                sample_dict['nhan_name'] = row.Sample.label.name
-                sample_dict.pop('label')
-            sample_dict.pop('_sa_instance_state')
-            list_sample_dict.append(sample_dict)
-            # break
-        return list_sample_dict
+    def getAllSamples(page=1, per_page=10, offset=0):
+        try:
+            page = max(1, page)  # Ensure page is always at least 1
+            offset = (page - 1) * per_page
+            stmt = (
+                db.select(Sample)
+                .outerjoin(Sample.label)
+                .order_by(Sample.id)
+                .offset(offset)
+                .limit(per_page)
+            )
+            list_sample_dict = []
+            for row in db.session.execute(stmt):
+                sample_dict = row.Sample.__dict__
+                sample_dict['ngayTaoMau'] = row.Sample.ngayTaoMau.__str__()
+                sample_dict['ngaySuaMau'] = row.Sample.ngaySuaMau.__str__()
+                if row.Sample.label != None:
+                    sample_dict['nhan_id'] = row.Sample.label.id
+                    sample_dict['nhan_name'] = row.Sample.label.name
+                    sample_dict.pop('label')
+                sample_dict.pop('_sa_instance_state')
+                list_sample_dict.append(sample_dict)
+                # break
+            return list_sample_dict
+        except Exception as e:
+            print("Error executing SQL query:", str(e))
+            return None
+
+    def searchSamplesByTitle(title, page, per_page, offset):
+        try:
+            stmt = (
+                db.select(Sample)
+                .filter(Sample.title.ilike(f"%{title}%"))
+                .outerjoin(Sample.label)
+                .order_by(Sample.id)
+                .offset(offset)
+                .limit(per_page)
+            )
+            list_sample_dict = []
+            for row in db.session.execute(stmt):
+                sample_dict = row.Sample.__dict__
+                sample_dict['ngayTaoMau'] = row.Sample.ngayTaoMau.__str__()
+                sample_dict['ngaySuaMau'] = row.Sample.ngaySuaMau.__str__()
+                if row.Sample.label != None:
+                    sample_dict['nhan_id'] = row.Sample.label.id
+                    sample_dict['nhan_name'] = row.Sample.label.name
+                    sample_dict.pop('label')
+                sample_dict.pop('_sa_instance_state')
+                list_sample_dict.append(sample_dict)
+                # break
+            return list_sample_dict
+        except Exception as e:
+            print("Error executing SQL query:", str(e))
+            return None
+
+    def countSamplesByTitle(title):
+        try:
+            count = Sample.query.filter(Sample.title.ilike(f"%{title}%")).count()
+            return count
+        except Exception as e:
+            print("Error executing SQL query:", str(e))
+            return 0
 
     def getOneSampleById(id):
         sample = Sample.query.get(id)
@@ -136,4 +179,23 @@ class Sample(db.Model):
         except Exception as e:
             print("Error executing SQL query:", str(e))
             return None
+        
+    # def searchSamplesByTitle(title):
+    #     try:
+    #         samples = Sample.query.filter(Sample.title.ilike(f"%{title}%")).all()
+    #         result = []
+    #         for sample in samples:
+    #             sample_dict = sample.as_dict()
+    #             sample_dict['ngayTaoMau'] = sample.ngayTaoMau.__str__()
+    #             sample_dict['ngaySuaMau'] = sample.ngaySuaMau.__str__()
+    #             sample_dict['nhan_id'] = sample.label.id
+    #             sample_dict['nhan_name'] = sample.label.name
+    #             result.append(sample_dict)
+    #         return result
+    #     except Exception as e:
+    #         print("Error executing SQL query:", str(e))
+    #         return None
+
+
+
 

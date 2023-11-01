@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Table, Button } from "react-bootstrap";
@@ -6,12 +6,13 @@ import ReactPaginate from "react-paginate";
 
 function Maus() {
     const [maus, setMaus] = useState([]);
-    const [expandedMaus, setExpandedMaus] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const mausPerPage = 5;
-    const [searchTerm, setSearchTerm] = useState(""); // Step 1
-
+    const [expandedMaus, setExpandedMaus] = useState([]);
+    const mausPerPage = 10;
+    const [searchTerm, setSearchTerm] = useState("");
+    const [searchInput, setSearchInput] = useState(""); 
     const navigate = useNavigate();
+    const [totalPages, setTotalPages] = useState(1);
 
     const onViewClick = (id) => {
         navigate(`/mau/${id}`);
@@ -20,24 +21,34 @@ function Maus() {
     const handleDelete = async (id) => {
         try {
             await axios.delete(`http://localhost:5000/maus/delete/${id}`);
-            fetchMaus();
+            fetchMaus(currentPage, searchTerm);
         } catch (error) {
             console.error("Error deleting mau:", error);
         }
     };
 
-    const fetchMaus = async () => {
+    const fetchMaus = async (page = 1, perPage = 10, searchTerm = "") => {
         try {
-            const response = await axios.get('http://localhost:5000/maus');
-            setMaus(response.data);
+            let apiUrl = `http://localhost:5000/maus?page=${page}&per_page=${perPage}`;
+            if (searchTerm) {
+                apiUrl = `http://localhost:5000/maus?title=${searchTerm}&page=${page}&per_page=${perPage}`;
+            }
+
+            const response = await axios.get(apiUrl);
+            setMaus(response.data.maus);
+            setTotalPages(Math.ceil(response.data.total_count / mausPerPage));
         } catch (error) {
             console.error("Error fetching maus:", error);
         }
     };
 
     useEffect(() => {
-        fetchMaus();
-    }, []);
+        fetchMaus(currentPage + 1, mausPerPage, searchTerm);
+    }, [currentPage, searchTerm]);
+
+    const handlePageClick = ({ selected }) => {
+        setCurrentPage(selected);
+    };
 
     const toggleExpand = (id) => {
         if (expandedMaus.includes(id)) {
@@ -47,33 +58,32 @@ function Maus() {
         }
     };
 
-    const pageCount = Math.ceil(maus.length / mausPerPage);
-
-    const handlePageClick = ({ selected }) => {
-        setCurrentPage(selected);
+    const confirmDeleteAlert = (id) => {
+        const confirm = window.confirm("Bạn có chắc chắn muốn xóa mẫu này không?");
+        if (confirm) {
+            handleDelete(id);
+        }
     };
 
-    const filteredMaus = maus.filter((mau) => {
-        return (
-            mau.title.toLowerCase().includes(searchTerm.toLowerCase()) // Step 2
-        );
-    });
-
-    const currentMaus = filteredMaus.slice(currentPage * mausPerPage, (currentPage + 1) * mausPerPage); // Step 4
+    const searchMaus = () => {
+        setSearchTerm(searchInput);
+    };
 
     return (
         <div>
             <h2 className="text-center">Mẫu List</h2>
             <div className="row">
-
                 <div className="col">
                     <div className="text-center mb-3">
                         <input
                             type="text"
                             placeholder="Search by Title"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)} // Step 3
+                            value={searchInput} 
+                            onChange={(e) => setSearchInput(e.target.value)}
                         />
+                        <button className="btn btn-primary" onClick={searchMaus}>
+                            Tìm Mẫu
+                        </button>
                     </div>
                     <button className="btn btn-primary" onClick={() => onViewClick(-1)}>
                         Thêm Mẫu
@@ -92,7 +102,7 @@ function Maus() {
                             </tr>
                         </thead>
                         <tbody>
-                            {currentMaus.map((mau) => (
+                            {maus.map((mau) => (
                                 <tr key={mau.id}>
                                     <td>{mau.id}</td>
                                     <td>{mau.title}</td>
@@ -106,9 +116,9 @@ function Maus() {
                                         </button>
                                     </td>
                                     <td>{mau.theLoai}</td>
-                                    <td>{new Date(mau.ngayTaoMau).toLocaleDateString()}</td>
+                                    <td>{mau.ngayTaoMau}</td>
                                     <td>
-                                        {mau.ngaySuaMau !== null ? new Date(mau.ngaySuaMau).toLocaleDateString() : ''}
+                                        {mau.ngaySuaMau || ""}
                                     </td>
                                     <td>{mau.nhan_name}</td>
                                     <td>
@@ -121,7 +131,7 @@ function Maus() {
                                         </Button>
                                         <Button
                                             variant="danger"
-                                            onClick={() => handleDelete(mau.id)}
+                                            onClick={() => confirmDeleteAlert(mau.id)}
                                         >
                                             Delete
                                         </Button>
@@ -135,7 +145,7 @@ function Maus() {
                             previousLabel={"Previous"}
                             nextLabel={"Next"}
                             breakLabel={"..."}
-                            pageCount={pageCount}
+                            pageCount={totalPages}
                             marginPagesDisplayed={2}
                             pageRangeDisplayed={5}
                             onPageChange={handlePageClick}

@@ -2,6 +2,7 @@ import axios from 'axios';
 import React from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from './auth-context';
 
 function LabelEdit() {
   const initialState = {
@@ -13,6 +14,8 @@ function LabelEdit() {
   const { id } = useParams()
   const [label, setLabel] = React.useState(initialState)
   const navigate = useNavigate();
+  const { getUser } = useAuth()
+  const user = getUser()
   
   React.useEffect(() => {
     if (id !== 'new') {
