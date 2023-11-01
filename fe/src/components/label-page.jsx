@@ -23,7 +23,7 @@ function LabelPage() {
   }, []);
 
   const handleDelete = (id) => {
-    const confirmDelete = window.confirm("Co chac?");
+    const confirmDelete = window.confirm("Bạn có muốn xóa không?");
     if (confirmDelete) {
       axios.delete(`http://localhost:5000/label/${id}`, {
         auth: user
