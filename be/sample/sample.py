@@ -28,25 +28,26 @@ class Sample(db.Model):
     def getAllSamples(page=1, per_page=10, offset=0):
         try:
             page = max(1, page)  # Ensure page is always at least 1
-
             offset = (page - 1) * per_page
-            samples = Sample.query \
-                .outerjoin(Sample.label) \
-                .order_by(Sample.id) \
-                .offset(offset) \
-                .limit(per_page) \
-                .all()
+            stmt = (
+                db.select(Sample)
+                .outerjoin(Sample.label)
+                .order_by(Sample.id)
+                .offset(offset)
+                .limit(per_page)
+            )
             list_sample_dict = []
-            for sample in samples:
-                sample_dict = sample.as_dict()
-                sample_dict['ngayTaoMau'] = sample.ngayTaoMau.__str__()
-                sample_dict['ngaySuaMau'] = sample.ngaySuaMau.__str__()
+            for row in db.session.execute(stmt):
+                sample_dict = row.Sample.__dict__
+                sample_dict['ngayTaoMau'] = row.Sample.ngayTaoMau.__str__()
+                sample_dict['ngaySuaMau'] = row.Sample.ngaySuaMau.__str__()
                 if row.Sample.label != None:
-                    sample_dict['nhan_id'] = sample.label.id
-                    sample_dict['nhan_name'] = sample.label.name
+                    sample_dict['nhan_id'] = row.Sample.label.id
+                    sample_dict['nhan_name'] = row.Sample.label.name
                     sample_dict.pop('label')
                 sample_dict.pop('_sa_instance_state')
                 list_sample_dict.append(sample_dict)
+                # break
             return list_sample_dict
         except Exception as e:
             print("Error executing SQL query:", str(e))
@@ -54,24 +55,26 @@ class Sample(db.Model):
 
     def searchSamplesByTitle(title, page, per_page, offset):
         try:
-            samples = Sample.query.filter(Sample.title.ilike(f"%{title}%")) \
-                .outerjoin(Sample.label) \
-                .order_by(Sample.id) \
-                .offset(offset) \
-                .limit(per_page) \
-                .all()
-            # Chuyển đổi kết quả thành danh sách từ điển và trả về
+            stmt = (
+                db.select(Sample)
+                .filter(Sample.title.ilike(f"%{title}%"))
+                .outerjoin(Sample.label)
+                .order_by(Sample.id)
+                .offset(offset)
+                .limit(per_page)
+            )
             list_sample_dict = []
-            for sample in samples:
-                sample_dict = sample.as_dict()
-                sample_dict['ngayTaoMau'] = sample.ngayTaoMau.__str__()
-                sample_dict['ngaySuaMau'] = sample.ngaySuaMau.__str__()
+            for row in db.session.execute(stmt):
+                sample_dict = row.Sample.__dict__
+                sample_dict['ngayTaoMau'] = row.Sample.ngayTaoMau.__str__()
+                sample_dict['ngaySuaMau'] = row.Sample.ngaySuaMau.__str__()
                 if row.Sample.label != None:
-                    sample_dict['nhan_id'] = sample.label.id
-                    sample_dict['nhan_name'] = sample.label.name
+                    sample_dict['nhan_id'] = row.Sample.label.id
+                    sample_dict['nhan_name'] = row.Sample.label.name
                     sample_dict.pop('label')
                 sample_dict.pop('_sa_instance_state')
                 list_sample_dict.append(sample_dict)
+                # break
             return list_sample_dict
         except Exception as e:
             print("Error executing SQL query:", str(e))
@@ -140,10 +143,6 @@ class Sample(db.Model):
             db.session.delete(sample)
             db.session.commit()
             data_to_remove = [sample.title, sample.noiDung, sample.theLoai]
-<<<<<<< HEAD
-            
-=======
->>>>>>> d19151b95b93565d52164297bd39548edcd71ee8
             with open('train.csv', 'r', newline='', encoding='utf-8') as csvfile, StringIO() as temp_file:
                 csv_reader = csv.reader(csvfile)
                 csv_writer = csv.writer(temp_file)
