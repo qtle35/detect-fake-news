@@ -22,5 +22,3 @@ bcrypt = Bcrypt()
 auth = HTTPBasicAuth()
 
 tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
-current_model = None
-tfidf_vec = joblib.load('models/tfidf_vec.pkl')

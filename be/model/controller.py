@@ -17,9 +17,9 @@ def checktrain():
 def predict():
     data = request.json
     text = data.get('text')
-    url = data.get('model')
-    prediction = Model.predic(text,url)
-    PredictLog.createPredictLog(text, url, 'Fake' if prediction[0] == 0 else 'Real')
+    id = data.get('model')
+    prediction = Model.predic(text,id)
+    PredictLog.createPredictLog(text, id, 'Fake' if prediction[0] == 0 else 'Real')
     if (prediction[0] == 0):
         output = "Unreliable"
     else:
@@ -29,16 +29,13 @@ def predict():
 @blueprint.route('/retrain', methods=['POST'])
 def retrain():
     data = request.json
-    print('--------------------------------')
-    print(data)
-    text = data.get('time')
     df_train = pd.read_csv('train.csv')
     df_test = pd.read_csv('test.csv')
     x_train = df_train['text']
     y_train = df_train['label']
     x_test = df_test['text']
     y_test = df_test['label']
-    Model.trainData(x_train, x_test, y_train, y_test, text)
+    Model.trainData(x_train, x_test, y_train, y_test)
     return '1', 200
 @blueprint.route('/getmodel', methods=['GET'])
 def getmodel():
