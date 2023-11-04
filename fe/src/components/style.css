@@ -1,0 +1,25 @@
+/* style.css */
+
+/* Định dạng cột theo kích thước cố định */
+th,
+td {
+    width: 150px;
+    /* Chiều rộng cố định cho tất cả cột */
+    word-wrap: break-word;
+    /* Tự động ngắt từ nếu quá dài */
+}
+
+/* Thiết lập layout của bảng */
+.table {
+    table-layout: fixed;
+    /* Bảng sử dụng kích thước cố định */
+    width: 100%;
+    /* Bảng có chiều rộng 100% */
+}
+.expand-icon {
+    cursor: pointer;
+    font-size: 18px;
+    /* Cỡ chữ */
+    color: #007bff;
+    /* Màu sắc */
+}

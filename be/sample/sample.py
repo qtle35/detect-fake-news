@@ -9,6 +9,7 @@ from sqlalchemy.orm import contains_eager
 from sqlalchemy import update, func
 from io import StringIO
 
+
 class Sample(db.Model):
     __tablename__ = "mau"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -24,6 +25,21 @@ class Sample(db.Model):
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def getSamples():
+        samples = Sample.query.all()
+        list_sample = []
+        for sample in samples:
+            sample_dict = sample.__dict__
+            sample_dict['ngayTaoMau'] = sample.ngayTaoMau.__str__()
+            sample_dict['ngaySuaMau'] = sample.ngaySuaMau.__str__()
+            if sample.label != None:
+                sample_dict['nhan_id'] = sample.label.id
+                sample_dict['nhan_name'] = sample.label.name
+                sample_dict.pop('label')
+            sample_dict.pop('_sa_instance_state')
+            list_sample.append(sample.__dict__)
+        return list_sample
 
     def getAllSamples(page=1, per_page=10, offset=0):
         try:
@@ -82,7 +98,8 @@ class Sample(db.Model):
 
     def countSamplesByTitle(title):
         try:
-            count = Sample.query.filter(Sample.title.ilike(f"%{title}%")).count()
+            count = Sample.query.filter(
+                Sample.title.ilike(f"%{title}%")).count()
             return count
         except Exception as e:
             print("Error executing SQL query:", str(e))
@@ -100,7 +117,7 @@ class Sample(db.Model):
 
     def createSample(sample):
         try:
-            new_sample = Sample(title=sample.get('title'), 
+            new_sample = Sample(title=sample.get('title'),
                                 noiDung=sample.get('noiDung'),
                                 theLoai=sample.get('theLoai'),
                                 ngayTaoMau=sample.get('ngayTaoMau'),
@@ -109,9 +126,10 @@ class Sample(db.Model):
                                 nhan_id=sample.get('nhan_id'))
             db.session.add(new_sample)
             db.session.commit()
-            with open('train.csv', 'a', newline='') as csvfile:
-                csv_writer = csv.writer(csvfile)
-                csv_writer.writerow([sample.get('title'), sample.get('noiDung'), sample.get('theLoai'), sample.get('ngayTaoMau'), sample.get('nhan_id')])
+            # with open('train.csv', 'a', newline='') as csvfile:
+            #     csv_writer = csv.writer(csvfile)
+            #     csv_writer.writerow([sample.get('title'), sample.get('noiDung'), sample.get(
+            #         'theLoai'), sample.get('ngayTaoMau'), sample.get('nhan_id')])
             # Sample.query.add_entity(sample)
             return True
         except Exception:
@@ -120,13 +138,13 @@ class Sample(db.Model):
     def updateSample(id, sample):
         try:
             new_sample = Sample.query.get(id)
-            new_sample.title=sample.get('title') 
-            new_sample.noiDung=sample.get('noiDung')
-            new_sample.theLoai=sample.get('theLoai')
-            new_sample.ngayTaoMau=sample.get('ngayTaoMau')
-            new_sample.ngaySuaMau=sample.get('ngaySuaMau')
-            new_sample.isnew=sample.get('isnew')
-            new_sample.nhan_id=sample.get('nhan_id')
+            new_sample.title = sample.get('title')
+            new_sample.noiDung = sample.get('noiDung')
+            new_sample.theLoai = sample.get('theLoai')
+            new_sample.ngayTaoMau = sample.get('ngayTaoMau')
+            new_sample.ngaySuaMau = sample.get('ngaySuaMau')
+            new_sample.isnew = sample.get('isnew')
+            new_sample.nhan_id = sample.get('nhan_id')
 
             db.session.commit()
             return True
@@ -143,28 +161,36 @@ class Sample(db.Model):
             db.session.delete(sample)
             db.session.commit()
             data_to_remove = [sample.title, sample.noiDung, sample.theLoai]
-            with open('train.csv', 'r', newline='', encoding='utf-8') as csvfile, StringIO() as temp_file:
-                csv_reader = csv.reader(csvfile)
-                csv_writer = csv.writer(temp_file)
+            # with open('train.csv', 'r', newline='', encoding='utf-8') as csvfile, StringIO() as temp_file:
+            #     csv_reader = csv.reader(csvfile)
+            #     csv_writer = csv.writer(temp_file)
 
-                for row in csv_reader:
-                    if data_to_remove != row[0:3]:  # So sánh các thông tin
-                        csv_writer.writerow(row)
+            #     for row in csv_reader:
+            #         if data_to_remove != row[0:3]:  # So sánh các thông tin
+            #             csv_writer.writerow(row)
 
-                # Ghi lại dữ liệu đã lọc vào tệp CSV
-                with open('train.csv', 'w', newline='', encoding='utf-8') as new_csvfile:
-                    new_csvfile.write(temp_file.getvalue())
+            #     # Ghi lại dữ liệu đã lọc vào tệp CSV
+            #     with open('train.csv', 'w', newline='', encoding='utf-8') as new_csvfile:
+            #         new_csvfile.write(temp_file.getvalue())
 
             return True
         except Exception as e:
             print(str(e))
             return False
 
-
     def set_isnew_to_null():
         try:
             update_stmt = update(Sample).values(isnew=None)
             db.session.execute(update_stmt)
+            db.session.commit()
+            return True
+        except Exception as e:
+            print(str(e))
+            return False
+    def set_isnew_to_null_select(ids):
+        try:
+            stmt = update(Sample).where(Sample.id.in_(ids)).values(isnew=None)
+            db.session.execute(stmt)
             db.session.commit()
             return True
         except Exception as e:
@@ -179,7 +205,7 @@ class Sample(db.Model):
         except Exception as e:
             print("Error executing SQL query:", str(e))
             return None
-        
+
     # def searchSamplesByTitle(title):
     #     try:
     #         samples = Sample.query.filter(Sample.title.ilike(f"%{title}%")).all()
@@ -195,7 +221,3 @@ class Sample(db.Model):
     #     except Exception as e:
     #         print("Error executing SQL query:", str(e))
     #         return None
-
-
-
-

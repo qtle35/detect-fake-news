@@ -75,3 +75,6 @@ def deleteSample(id):
 #     else:
 #         return jsonify({'message': 'Error while searching samples'}), 500
 
+@blueprint.route('/getsamples', methods=['GET'])
+def getsamples():
+    return jsonify(Sample.getSamples())

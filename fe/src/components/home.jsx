@@ -5,6 +5,8 @@ import moment from 'moment';
 import './home.css'
 import { FaTrash } from 'react-icons/fa';
 import { useAuth } from './auth-context';
+import SelectSamples from './select-sample';
+import Maus from './mau';
 
 function Home() {
     const [inputText, setInputText] = useState('');
@@ -13,7 +15,18 @@ function Home() {
     const [models, setModels] = useState([]);
     const [selectedModel, setSelectedModel] = useState('');
     const [countData, setCountData] = useState('');
-    const [isRetrain, setIsRetrain] = useState(false);
+    const [isRetrain, setIsRetrain] = useState(true);
+    const [showPopup, setShowPopup] = useState(false);
+    const openPopup = () => {
+        setShowPopup(true);
+    };
+
+    const closePopup = () => {
+        setShowPopup(false);
+        setIsRetrain(false);
+        setLoading(false)
+    };
+
     const { getUser } = useAuth()
     const user = getUser()
 
@@ -21,7 +34,7 @@ function Home() {
         axios.get('http://localhost:5000/getmodel')
             .then((response) => {
                 setModels(response.data);
-                setSelectedModel(`${response.data[0].name} ${response.data[0].date}`)
+                if (response.data) setSelectedModel(`${response.data[0].id}`)
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -61,39 +74,41 @@ function Home() {
 
     const handleRetrainSubmit = () => {
         setLoading(true);
-        const currentDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
-        axios.post('http://localhost:5000/retrain', { time: currentDateTime, model: selectedModel })
-            .then((response) => {
-                axios.get('http://localhost:5000/getmodel')
-                    .then((response) => {
-                        setModels(response.data);
-                        setLoading(false);
-                        setSelectedModel(`${response.data[0].name} ${response.data[0].date}`)
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                        alert('Failed to fetch models. Please try again.');
-                        setLoading(false);
-                    });
-                setIsRetrain(true)
-                axios.get('http://localhost:5000/getdatacount')
-                    .then((response) => {
-                        setCountData(response.data);
-                        if (response.data.new > Math.floor(response.data.total / 10)) {
-                            setIsRetrain(false);
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                    });
-                setPrediction(response.data.prediction);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                setLoading(false);
-                alert('Retraining failed. Please try again.');
+        if (!isRetrain) {
+            openPopup();
+        }
+        // axios.post('http://localhost:5000/retrain', {model: selectedModel })
+        //     .then((response) => {
+        //         axios.get('http://localhost:5000/getmodel')
+        //             .then((response) => {
+        //                 setModels(response.data);
+        //                 setLoading(false);
+        //                 setSelectedModel(`${response.data[0].id} ${response.data[0].date}`)
+        //             })
+        //             .catch((error) => {
+        //                 console.error('Error:', error);
+        //                 alert('Failed to fetch models. Please try again.');
+        //                 setLoading(false);
+        //             });
+        //         setIsRetrain(true)
+        //         axios.get('http://localhost:5000/getdatacount')
+        //             .then((response) => {
+        //                 setCountData(response.data);
+        //                 if (response.data.new > Math.floor(response.data.total / 10)) {
+        //                     setIsRetrain(false);
+        //                 }
+        //             })
+        //             .catch((error) => {
+        //                 console.error('Error:', error);
+        //             });
+        //         setPrediction(response.data.prediction);
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error:', error);
+        //         setLoading(false);
+        //         alert('Retraining failed. Please try again.');
 
-            });
+        //     });
     };
 
     const handleDeleteModel = (model) => {
@@ -122,6 +137,19 @@ function Home() {
 
     return (
         <Container>
+            {showPopup && (
+                <div className="popup">
+                    <div className="popup-content">
+                        <span className="close" onClick={closePopup}></span>
+                        <SelectSamples />
+                    </div>
+                </div>
+            )}
+            {!showPopup && (
+                <div>
+                    
+                </div>
+            )}
             <h1 className="d-flex justify-content-center mt-[4rem] mb-4 text-3xl font-extrabold md:text-5xl lg:text-6xl">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r to-violet-600 from-blue-900 leading-normal">
                     Machine Learning Detect FakeNews
@@ -137,7 +165,7 @@ function Home() {
                                     onChange={(e) => setSelectedModel(e.target.value)}
                                 >
                                     {models.map((model, index) => (
-                                        <option key={index} value={`${model.name} ${model.date}`} >{`${model.id} ${model.name} ${model.date}`}</option>
+                                        <option key={index} value={`${model.id}`} >{`${model.id} ${model.name} ${model.date}`}</option>
                                     ))}
                                 </select>
                             </div>
