@@ -5,7 +5,7 @@ import re
 import os
 from dotenv import load_dotenv
 import datetime
-print(datetime.datetime.now())
+print(str(datetime.datetime.now()).replace(':', '').replace(' ', '-'))
 
 # load_dotenv()
 # # Kết nối đến cơ sở dữ liệu MySQL

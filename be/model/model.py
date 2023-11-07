@@ -25,6 +25,7 @@ class Model(db.Model):
     f1 = db.Column(db.Double, nullable=False)
     url_model = db.Column(db.String(255), nullable=False)
     url_tfidf = db.Column(db.String(255), nullable=False)
+    # total_sample_train = db.Column(db.Integer, nullable=False)
 
     def getModels():
         models = Model.query.all()
@@ -63,8 +64,8 @@ class Model(db.Model):
     def trainData(x_train, x_test, y_train, y_test):
         datetime_now = datetime.datetime.now()
         tfidf = tfidf_vectorizer.fit(x_train)
-        joblib.dump(tfidf, f"models/tfidf_{datetime_now}.pkl")
-        Sample.set_isnew_to_null()
+        joblib.dump(tfidf, f"models/tfidf_{str(datetime_now).replace(':', '').replace(' ', '-')}.pkl")
+        # Sample.set_isnew_to_null()
         tfidf_train = tfidf_vectorizer.transform(x_train)
         tfidf_test = tfidf_vectorizer.transform(x_test)
         # Naive Bayes model
@@ -73,7 +74,8 @@ class Model(db.Model):
         nb_model.fit(tfidf_train, y_train)
         y_pred = nb_model.predict(tfidf_test)
         score = Model.evaluateModel(y_test, y_pred)
-        joblib.dump(nb_model, f"models/nbmodel_{datetime_now}.pkl")
+        joblib.dump(
+            nb_model, f"models/nbmodel_{str(datetime_now).replace(':', '').replace(' ', '-')}.pkl")
 
         Model.saveModel('nbmodel', datetime_now, score)
         # LogisticRegression model
@@ -81,14 +83,16 @@ class Model(db.Model):
         lr_model.fit(tfidf_train, y_train)
         y_pred = lr_model.predict(tfidf_test)
         score = Model.evaluateModel(y_test, y_pred)
-        joblib.dump(lr_model, f"models/lrmodel_{datetime_now}.pkl")
+        joblib.dump(
+            lr_model, f"models/lrmodel_{str(datetime_now).replace(':', '').replace(' ', '-')}.pkl")
         Model.saveModel('lrmodel', datetime_now, score)
         # PassiveAggressiveClassifier
         pac_model = PassiveAggressiveClassifier(max_iter=50)
         pac_model.fit(tfidf_train, y_train)
         y_pred = pac_model.predict(tfidf_test)
         score = Model.evaluateModel(y_test, y_pred)
-        joblib.dump(pac_model, f"models/pacmodel_{datetime_now}.pkl")
+        joblib.dump(
+            pac_model, f"models/pacmodel_{str(datetime_now).replace(':', '').replace(' ', '-')}.pkl")
         Model.saveModel('pacmodel', datetime_now, score)
         
     def saveModel(name, datetime, score):
@@ -101,8 +105,8 @@ class Model(db.Model):
                             pre=score['pre'],
                             re=score['re'],
                             f1=score['f1'],
-                            url_model = f"models/{name}_{datetime}.pkl",
-                            url_tfidf = f"models/tfidf_{datetime}.pkl")
+                              url_model=f"models/{name}_{str(datetime).replace(':', '').replace(' ', '-')}.pkl",
+                              url_tfidf=f"models/tfidf_{str(datetime).replace(':', '').replace(' ', '-')}.pkl")
 
             db.session.add(new_model)
             db.session.commit()
