@@ -22,7 +22,7 @@ function ModelStatDetail(props) {
     if (endTime < startTime) {
       alert('End time must be greater than start time. Please try again.');
     }
-    axios.get(`http://localhost:5000/model-stat?name=${props.name}&start-time=${moment(startTime).format('YYYY-MM-DD hh:mm:ss')}&end-time=${moment(endTime).format('YYYY-MM-DD hh:mm:ss')}`)
+    axios.get(`http://localhost:5000/model-stat?name=${props.name}&start-time=${moment(startTime).format('YYYY-MM-DD HH:mm:ss')}&end-time=${moment(endTime).format('YYYY-MM-DD HH:mm:ss')}`)
       .then((response) => {
         setModelStats(response.data);
       }).catch((error) => {
@@ -50,7 +50,7 @@ function ModelStatDetail(props) {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" tickFormatter={(date) => {return moment(date).format('YY-MM-DD hh:mm:ss')}}/>
+          <XAxis dataKey="date" tickFormatter={(date) => {return moment(date).format('YY-MM-DD HH:mm:ss')}}/>
           <YAxis />
           <Tooltip />
           <Legend />
