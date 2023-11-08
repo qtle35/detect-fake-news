@@ -25,7 +25,6 @@ function ModelStatDetail(props) {
     axios.get(`http://localhost:5000/model-stat?name=${props.name}&start-time=${moment(startTime).format('YYYY-MM-DD hh:mm:ss')}&end-time=${moment(endTime).format('YYYY-MM-DD hh:mm:ss')}`)
       .then((response) => {
         setModelStats(response.data);
-        console.log(response.data);
       }).catch((error) => {
         console.error('Error:', error);
         alert('Get failed. Please try again.');
@@ -51,7 +50,7 @@ function ModelStatDetail(props) {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          <XAxis dataKey="date" tickFormatter={(date) => {return moment(date).format('YY-MM-DD hh:mm:ss')}}/>
           <YAxis />
           <Tooltip />
           <Legend />
