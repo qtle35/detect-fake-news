@@ -19,6 +19,7 @@ function LabelPage() {
       })
       .catch((error) => {
         console.error(error);
+        alert('Get failed. Please try again.');
       });
   }, []);
 
@@ -33,7 +34,7 @@ function LabelPage() {
           setLabels(updatedLabels);
         }).catch((error) => {
           console.error('Error:', error);
-          alert('Deletion failed. Please try again.');
+          alert('Delete failed. Please try again.');
         });
     }
   };

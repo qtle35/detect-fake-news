@@ -128,4 +128,12 @@ class Model(db.Model):
         }
         return result
 
-    
+    def getModelStat(name, startTime, endTime):
+        models = Model.query.filter(Model.name.like(f"%{name}%"))\
+                            .filter(Model.date <= endTime)\
+                            .filter(Model.date >= startTime)
+        list_model_dict = []
+        for model in models:
+            model.__dict__.pop('_sa_instance_state') 
+            list_model_dict.append(model.__dict__)
+        return list_model_dict
