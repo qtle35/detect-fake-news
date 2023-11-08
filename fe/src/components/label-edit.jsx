@@ -26,6 +26,7 @@ function LabelEdit() {
           setLabel(res.data)
         }).catch(err => {
           console.log(err)
+          alert('Get failed. Please try again.');
         })
     }
   }, [])
@@ -46,6 +47,7 @@ function LabelEdit() {
         }).catch(err => {
           checkError = true;
           console.log(err)
+          alert('Update failed. Please try again.');
         })
     } else {
       await axios.post(`http://localhost:5000/label/new`, label, {
@@ -56,6 +58,7 @@ function LabelEdit() {
         }).catch(err => {
           checkError = true;
           console.log(err)
+          alert('Update failed. Please try again.');
         })
     }
     if (!checkError)

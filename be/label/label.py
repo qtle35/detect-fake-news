@@ -8,13 +8,11 @@ class Label(db.Model):
     description = db.Column(db.Text, nullable=True)
     # samples = db.relationship("Sample", back_populates="label", passive_deletes='all')
 
-
-
     def as_dict(self):
-            return {
-                'id': self.id,
-                'name': self.name,
-            }
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
 
     def getAllLabels():
         labels = Label.query.all()

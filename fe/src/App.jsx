@@ -10,6 +10,7 @@ import { AuthProvider } from './components/auth-context'
 import PrivateRoute from './components/private-route'
 import PredictLogPage from './components/predict-log';
 import SelectSamples from './components/select-sample';
+import ModelStatPage from './components/model-stat';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
                 <Route path='/maus' element={<Maus />} />
                 <Route path='/mau/:id' element={<MauDetail />} />
                 <Route path='/predict-log' element={<PredictLogPage />} />
+                <Route path='/model-stat' element={<ModelStatPage />} />
                 {/* <Route path='/selectsample' element={<SelectSamples />} /> */}
               </Routes>
             </main>

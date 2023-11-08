@@ -70,3 +70,13 @@ def deletemodel():
     if Model.deleteModel(request.json.get('model')):
         return '1', 200
     return jsonify({'message': 'Error'}), 400
+
+@blueprint.route('/model-stat', methods=['GET'])
+def statModel():
+    name = request.args.get('name')
+    startTime = request.args.get('start-time')
+    endTime = request.args.get('end-time')
+    if not name or not startTime or not endTime:
+        return jsonify({'message': 'Error'}), 400
+    return json.dumps(Model.getModelStat(name, startTime, endTime)), 200
+    # '2023-11-07 21:44:46'
