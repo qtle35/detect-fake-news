@@ -35,13 +35,6 @@ def getSample(id):
     res = Sample.getOneSampleById(id)
     if not res:
         return jsonify({'message': f'Failed to get sample with id {id}'}), 400
-
-    label_dict = res['label'].as_dict()
-    
-    res.pop('label')
-    
-    res.update(label_dict)
-    
     return jsonify(res)
 
 

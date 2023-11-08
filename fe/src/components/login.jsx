@@ -61,6 +61,7 @@ const Login = () => {
             <Form.Control
               id='password'
               name='password'
+              type='password'
               value={password}
               onChange={handleInputChange}
             />
