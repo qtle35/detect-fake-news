@@ -15,7 +15,7 @@ function Home() {
     const [models, setModels] = useState([]);
     const [selectedModel, setSelectedModel] = useState('');
     const [countData, setCountData] = useState('');
-    const [isRetrain, setIsRetrain] = useState(false);
+    const [isRetrain, setIsRetrain] = useState(true);
     const [showPopup, setShowPopup] = useState(false);
     const openPopup = () => {
         setShowPopup(true);

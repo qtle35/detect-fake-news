@@ -1,4 +1,4 @@
-from factory import db
+from factory import db, ma
 from flask import jsonify
 
 class Label(db.Model):
@@ -8,52 +8,28 @@ class Label(db.Model):
     description = db.Column(db.Text, nullable=True)
     # samples = db.relationship("Sample", back_populates="label", passive_deletes='all')
 
-    def as_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-        }
-
     def getAllLabels():
-        labels = Label.query.all()
-        list_label_dict = []
-        for label in labels:
-            label.__dict__.pop('_sa_instance_state') 
-            list_label_dict.append(label.__dict__)
-        return list_label_dict
+        return Label.query.all()
 
     def getOneLabelById(id):
-        label = Label.query.get(id)
-        label_dict = label.__dict__
-        label_dict.pop('_sa_instance_state')
-        return label_dict
+        return Label.query.get(id)
     
     def getLabels(search):
         if not search:
             search = ''
-        labels = Label.query.filter(Label.name.like(f"%{search}%")).all()
-        list_label_dict = []
-        for label in labels:
-            label.__dict__.pop('_sa_instance_state') 
-            list_label_dict.append(label.__dict__)
-        return list_label_dict
+        print(Label.query.filter(Label.name.like(f"%{search}%")).all())
+        return Label.query.filter(Label.name.like(f"%{search}%")).all()
 
     def createLabel(label):
         try:
-            new_label = Label(name=label.get('name'), description=label.get('description'))
-            db.session.add(new_label)
+            db.session.add(label)
             db.session.commit()
-            # Label.query.add_entity(label)
             return True
         except Exception:
             return False
 
-    def updateLabel(id, label):
+    def updateLabel(label):
         try:
-            new_label = Label.query.get(id)
-            new_label.name = label.get('name')
-            new_label.description = label.get('description')
-
             db.session.commit()
             return True
         except Exception as e:
@@ -70,3 +46,11 @@ class Label(db.Model):
             return True
         except Exception:
             return False
+
+class LabelSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Label
+        load_instance = True
+
+label_schema = LabelSchema()
+labels_schema = LabelSchema(many=True)

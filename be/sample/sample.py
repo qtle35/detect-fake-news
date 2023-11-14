@@ -1,8 +1,8 @@
-from factory import db
+from factory import db, ma
 from flask import jsonify
 from sqlalchemy.dialects.mysql import LONGTEXT, TINYINT, DATE
 import csv
-from label.label import Label
+from label.label import Label, LabelSchema
 from sqlalchemy import text
 import json
 from sqlalchemy.orm import contains_eager
@@ -27,47 +27,49 @@ class Sample(db.Model):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def getSamples():
-        samples = Sample.query.all()
-        list_sample = []
-        for sample in samples:
-            sample_dict = sample.__dict__
-            sample_dict['ngayTaoMau'] = sample.ngayTaoMau.__str__()
-            sample_dict['ngaySuaMau'] = sample.ngaySuaMau.__str__()
-            if sample.label != None:
-                sample_dict['nhan_id'] = sample.label.id
-                sample_dict['nhan_name'] = sample.label.name
-                sample_dict.pop('label')
-            sample_dict.pop('_sa_instance_state')
-            list_sample.append(sample.__dict__)
-        return list_sample
+        return Sample.query.all()
+        # list_sample = []
+        # for sample in samples:
+        #     sample_dict = sample.__dict__
+        #     sample_dict['ngayTaoMau'] = sample.ngayTaoMau.__str__()
+        #     sample_dict['ngaySuaMau'] = sample.ngaySuaMau.__str__()
+        #     if sample.label != None:
+        #         sample_dict['nhan_id'] = sample.label.id
+        #         sample_dict['nhan_name'] = sample.label.name
+        #         sample_dict.pop('label')
+        #     sample_dict.pop('_sa_instance_state')
+        #     list_sample.append(sample.__dict__)
+        # return list_sample
 
     def getAllSamples(page=1, per_page=10, offset=0):
-        try:
+        # try:
             page = max(1, page)  # Ensure page is always at least 1
             offset = (page - 1) * per_page
-            stmt = (
-                db.select(Sample)
-                .outerjoin(Sample.label)
-                .order_by(Sample.id)
-                .offset(offset)
-                .limit(per_page)
-            )
-            list_sample_dict = []
-            for row in db.session.execute(stmt):
-                sample_dict = row.Sample.__dict__
-                sample_dict['ngayTaoMau'] = row.Sample.ngayTaoMau.__str__()
-                sample_dict['ngaySuaMau'] = row.Sample.ngaySuaMau.__str__()
-                if row.Sample.label != None:
-                    sample_dict['nhan_id'] = row.Sample.label.id
-                    sample_dict['nhan_name'] = row.Sample.label.name
-                    sample_dict.pop('label')
-                sample_dict.pop('_sa_instance_state')
-                list_sample_dict.append(sample_dict)
-                # break
-            return list_sample_dict
-        except Exception as e:
-            print("Error executing SQL query:", str(e))
-            return None
+            return Sample.query.order_by(Sample.id).offset(offset).limit(per_page).all()
+
+        #     stmt = (
+        #         db.select(Sample)
+        #         .outerjoin(Sample.label)
+        #         .order_by(Sample.id)
+        #         .offset(offset)
+        #         .limit(per_page)
+        #     )
+        #     list_sample_dict = []
+        #     for row in db.session.execute(stmt):
+        #         sample_dict = row.Sample.__dict__
+        #         sample_dict['ngayTaoMau'] = row.Sample.ngayTaoMau.__str__()
+        #         sample_dict['ngaySuaMau'] = row.Sample.ngaySuaMau.__str__()
+        #         if row.Sample.label != None:
+        #             sample_dict['nhan_id'] = row.Sample.label.id
+        #             sample_dict['nhan_name'] = row.Sample.label.name
+        #             sample_dict.pop('label')
+        #         sample_dict.pop('_sa_instance_state')
+        #         list_sample_dict.append(sample_dict)
+        #         # break
+        #     return list_sample_dict
+        # except Exception as e:
+        #     print("Error executing SQL query:", str(e))
+        #     return None
 
     def searchSamplesByTitle(title, page, per_page, offset):
         try:
@@ -221,3 +223,11 @@ class Sample(db.Model):
     #     except Exception as e:
     #         print("Error executing SQL query:", str(e))
     #         return None
+
+class SampleSchema(ma.SQLAlchemyAutoSchema):
+    label = ma.Nested(LabelSchema, only=['id', 'name'])
+    class Meta:
+        model = Sample
+
+sample_schema = SampleSchema()
+samples_schema = SampleSchema(many=True)

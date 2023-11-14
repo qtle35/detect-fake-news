@@ -1,39 +1,38 @@
 from flask import jsonify, request
 from routes import blueprint
-from label.label import Label
+from label.label import Label, labels_schema, label_schema
 import json
-from factory import auth
+from factory import auth, db
 
 @blueprint.route('/label/all', methods=['GET'])
 @auth.login_required
 def getAllLabels():
-    return json.dumps(Label.getAllLabels())
+    return labels_schema.dump(Label.getAllLabels())
 
 @blueprint.route('/label', methods=['GET'])
 @auth.login_required
 def getLabels():
     search = request.args.get('search')
-    return json.dumps(Label.getLabels(search))
+    return labels_schema.dump(Label.getLabels(search))
 
 @blueprint.route('/label/<id>', methods=['GET'])
 @auth.login_required
 def getLabel(id):
-    res = Label.getOneLabelById(id)
-    if not res:
-        return jsonify({'message': f'Failed to get label with id {id}'}), 400
-    return res
+    return label_schema.dump(Label.getOneLabelById(id))
 
 @blueprint.route('/label/new', methods=['POST'])
 @auth.login_required
 def createLabel():
-    if Label.createLabel(request.json):
+    label = label_schema.load(request.json)
+    if Label.createLabel(label):
         return jsonify({'message': 'Created'}), 201
     return jsonify({'message': 'Error'}), 400
 
-@blueprint.route('/label/<id>', methods=['PUT'])
+@blueprint.route('/label', methods=['PUT'])
 @auth.login_required
-def updateLabel(id):
-    if Label.updateLabel(id, request.json):
+def updateLabel():
+    label = label_schema.load(request.json)
+    if Label.updateLabel(label):
         return jsonify({'message': 'Updated'}), 200
     return jsonify({'message': 'Error'}), 400
 

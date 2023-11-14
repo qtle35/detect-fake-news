@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from routes import blueprint
-from sample.sample import Sample
+from sample.sample import Sample, samples_schema
 import json  
 from factory import auth
 
@@ -26,7 +26,7 @@ def getMaus():
         total_count = Sample.query.count()
 
     return jsonify({
-        'maus': maus,
+        'maus': samples_schema.dump(maus),
         'total_count': total_count
     })
 
@@ -70,4 +70,5 @@ def deleteSample(id):
 
 @blueprint.route('/getsamples', methods=['GET'])
 def getsamples():
-    return jsonify(Sample.getSamples())
+    # return jsonify(Sample.getSamples())
+    return samples_schema.dump(Sample.getSamples())
