@@ -86,7 +86,7 @@ function SelectSamples(props) {
                             <td style={{ width: '7%' }}>{mau.theLoai}</td>
                             <td style={{ width: '8%' }}>{mau.ngayTaoMau}</td>
                             <td style={{ width: '8%' }}>{mau.ngaySuaMau || ""}</td>
-                            <td style={{ width: '5%' }}>{mau.nhan_name}</td>
+                            <td style={{ width: '5%' }}>{mau.label.name}</td>
                         </tr>
                     </tbody>
                 </Table>

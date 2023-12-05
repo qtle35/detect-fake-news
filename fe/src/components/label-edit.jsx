@@ -6,7 +6,7 @@ import { useAuth } from './auth-context';
 
 function LabelEdit() {
   const initialState = {
-    id: '',
+    id: undefined,
     name: '',
     description: ''
   };
@@ -58,7 +58,7 @@ function LabelEdit() {
         }).catch(err => {
           checkError = true;
           console.log(err)
-          alert('Update failed. Please try again.');
+          alert('Create failed. Please try again.');
         })
     }
     if (!checkError)

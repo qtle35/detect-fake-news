@@ -44,7 +44,7 @@ def retrain():
     print('1111')
     for item in selected:
         X.append(item['noiDung'])
-        label = 1 if item['nhan_name'] == 'True' else 0
+        label = item['label']['id']
         y.append(label)
         ids.append(item['id'])
     x_train, x_test, y_train, y_test = train_test_split(
